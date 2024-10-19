@@ -1825,6 +1825,7 @@ checksum = "f25c0e292a7ca6d6498557ff1df68f32c99850012b6ea401cf8daf771f22ff53"
 name = "ducks-test"
 version = "0.1.0"
 dependencies = [
+ "aws-lc-sys",
  "bevy",
  "bevy_kira_audio",
  "bevy_shapes",

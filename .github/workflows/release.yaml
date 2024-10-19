@@ -156,6 +156,18 @@ jobs:
         if: ${{ matrix.platform == 'linux' }}
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev libwayland-dev libxkbcommon-dev
 
+      - name: (new step) Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang libclang-dev build-essential
+
+      - name: (new step) Install libc development package
+        run: |
+          sudo apt-get install -y libc6-dev
+
+      - name: (new step) Install Wasm32 Target
+        run: rustup target add wasm32-unknown-unknown
+
       - name: Prepare output directories
         run: rm -rf tmp; mkdir -p tmp/binary '${{ env.app }}'
 
