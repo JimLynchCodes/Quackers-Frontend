@@ -456,24 +456,24 @@ fn setup_leaderboard_table(
     // Sample data for the table
     let scores = vec![
         Score {
-            name: "Player 1".to_string(),
-            value: 100,
+            name: "--".to_string(),
+            value: 0,
         },
         Score {
-            name: "Player 2".to_string(),
-            value: 150,
+            name: "--".to_string(),
+            value: 0,
         },
         Score {
-            name: "Player 3".to_string(),
-            value: 120,
+            name: "--".to_string(),
+            value: 0,
         },
         Score {
-            name: "Player 4".to_string(),
-            value: 120,
+            name: "--".to_string(),
+            value: 0,
         },
         Score {
-            name: "Player 5".to_string(),
-            value: 120,
+            name: "--".to_string(),
+            value: 0,
         },
     ];
 

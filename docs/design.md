@@ -92,6 +92,7 @@ Spawn your UI elements by extending the [`Widgets` trait](../src/theme/widgets.r
 ```rust
 pub trait Widgets {
     fn button(&mut self, text: impl Into<String>) -> EntityCommands;
+    fn quack_button(&mut self, text: impl Into<String>) -> EntityCommands;
     fn header(&mut self, text: impl Into<String>) -> EntityCommands;
     fn label(&mut self, text: impl Into<String>) -> EntityCommands;
     fn text_input(&mut self, text: impl Into<String>) -> EntityCommands;

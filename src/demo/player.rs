@@ -5,6 +5,11 @@ use virtual_joystick::{
     create_joystick, JoystickFloating, JoystickInvisible, NoAction, VirtualJoystickEvent,
     VirtualJoystickPlugin,
 };
+// use bevy::ui::{UiPlugin};
+// use bevy::prelude::*;
+
+use crate::theme::palette::{BUTTON_TEXT, NODE_BACKGROUND};
+use crate::theme::widgets::Containers;
 
 use crate::demo::other_player::{unpack_duck_color, NewJoinerDataWithAllPlayers};
 use crate::{
@@ -27,6 +32,7 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<Player>();
 
     app.add_plugins(VirtualJoystickPlugin::<String>::default());
+    // app.add_plugins(ShapePlugin);
     app.add_systems(Startup, create_joystick_scene);
     app.add_systems(Update, handle_joystick_or_keyboard_input);
     app.add_systems(Startup, quack_sound_setup);
@@ -47,11 +53,11 @@ fn spacial_listener_setup(
 
 fn quack_btn_handler(
     mut commands: Commands,
-    interaction_query: Query<(Entity, &Interaction), Changed<Interaction>>,
+    interaction_query: Query<(Entity, &Interaction, &QuackBtnButton), Changed<Interaction>>,
     audio: Res<QuackAudio>,
     audio_assets: Res<Assets<AudioSource>>,
 ) {
-    for (_entity, interaction) in &interaction_query {
+    for (_entity, interaction, _quack_btn) in &interaction_query {
         if matches!(interaction, Interaction::Pressed) {
             println!("clicked quack btn!");
 
@@ -71,10 +77,46 @@ fn quack_btn_handler(
 
 fn add_quack_button(mut commands: Commands) {
     // Spawn a button at the bottom-right of the window
-    commands
-        .spawn(ButtonBundle {
+    // commands.ui_root()
+    // .insert(StateScoped(Screen::Gameplay))
+    //     .with_children(|children| {
+
+    //         // children.
+    //         // children.quack_button("Q").observe(enter_gameplay_screen);
+    //     });
+
+
+        commands.spawn(
+            
+            // ShapeBundle {
+            //     shape: Shape::RoundedRectangle {
+            //         width: 200.0,
+            //         height: 100.0,
+            //         radius: 20.0, // Radius for rounded corners
+            //     },
+            //     style: Style {
+            //         position_type: PositionType::Absolute,
+            //         position: Rect {
+            //             left: Val::Px(100.0),
+            //             top: Val::Px(100.0),
+            //             ..Default::default()
+            //         },
+            //         ..Default::default()
+            //     },
+            //     draw: Draw {
+            //         fill: Fill {
+            //             color: Color::rgb(0.5, 0.3, 0.7), // Color of the button
+            //         },
+            //         ..Default::default()
+            //     },
+            //     ..Default::default()
+            // }
+            
+            
+            ButtonBundle {
+            // name: Name::new("QuackButton"),
             style: Style {
-                width: Val::Px(200.0),
+                width: Val::Px(65.0),
                 height: Val::Px(65.0),
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
@@ -83,10 +125,26 @@ fn add_quack_button(mut commands: Commands) {
                 bottom: Val::Percent(5.0),
                 ..Default::default()
             },
-            background_color: Color::srgb(0.15, 0.15, 0.15).into(),
+            // background_color: Color::srgb(0.15, 0.15, 0.15).into(),
+            background_color: NODE_BACKGROUND.into(),
             ..Default::default()
-        })
-        .insert(QuackBtnButton);
+        }
+    
+    )
+        .insert(QuackBtnButton)
+        .with_children(|children| {
+            children.spawn((
+                Name::new("QuackButton Text"),
+                TextBundle::from_section(
+                    "Q",
+                    TextStyle {
+                        font_size: 40.0,
+                        color: BUTTON_TEXT,
+                        ..default()
+                    },
+                ),
+            ));
+        });
 }
 
 // Tag for the button that follows the camera

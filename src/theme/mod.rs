@@ -5,7 +5,7 @@
 
 pub mod interaction;
 pub mod palette;
-mod widgets;
+pub mod widgets;
 
 #[allow(unused_imports)]
 pub mod prelude {

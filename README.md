@@ -3,7 +3,7 @@
 
 This is the front-end (Rust) codebase for the online web game and virtual world, _Quackers._
 
-_Note: To run locally this project locally you also need to have the [backend websocket server](https://github.com/JimLynchCodes/Quackers-Backend/) running locally._
+_Note: To run locally this project locally you also need to have the [backend websocket server](https://github.com/JimLynchCodes/Quackers-Backend/) running locally on ._
 
 ## Running the game
 
@@ -13,6 +13,13 @@ Running your game locally:
 - Use [`trunk serve`](https://trunkrs.dev/) to run a web dev build.
 
 If you're using [VS Code](https://code.visualstudio.com/), this template comes with a [`.vscode/tasks.json`](./.vscode/tasks.json) file.
+
+
+## Run app against live backend server
+set the environment variable to run local frontend against the live backend:
+```
+export BACKEND_WS_ENDPOINT=wss://quackers-beta.jimlynchcodes.com/ws
+```
 
 <details>
   <summary>Run release builds</summary>

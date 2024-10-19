@@ -497,19 +497,17 @@ pub fn other_player_moved_ws_msg_handler(
 
 pub fn unpack_duck_color(color: String) -> Color {
     match color.as_str() {
-        // "blue" => Color::srgba(0.5, 0.5, 1.0, 1.),
-        // "red" => Color::srgba(0.5, 0.1, 0., 1.),
-        // "green" => Color::srgba(0., 0.9, 0., 1.),
-        // "white" => Color::WHITE,
-        // _ => Color::srgba(0.8, 1.0, 1.0, 1.0), // Teal
-        // _ => Color::srgba(1.0, 1.0, 0.8, 1.0), // Yellow
-        // _ => Color::srgba(0.70, 0.6, 1.0, 1.0), // Purple
-        // _ => Color::srgba(1.0, 0.8, 0.1, 1.0), // Pink
-        // _ => Color::srgba(1.0, 0.78, 0.49, 1.), // Light orange
-        // _ => Color::srgba(0.54, 0.81, 0.94, 1.), // Baby blue
-        // _ => Color::srgba(0.60, 1.0, 0.60, 1.), // Lime Green
-        // _ => Color::srgba(0.1, 0.5, 0.1, 1.), // Forest
+        "white" => Color::WHITE,
+        "teal" => Color::srgba(0.8, 1.0, 1.0, 1.0), // Teal
+        "yellow" => Color::srgba(1.0, 1.0, 0.8, 1.0), // Yellow
+        "purple" => Color::srgba(0.70, 0.6, 1.0, 1.0), // Purple
+        "pink" => Color::srgba(1.0, 0.84, 0.87, 1.0), // Pink
+        "light_orange" => Color::srgba(1.0, 0.8, 0.1, 1.0), // Light orange
+        "baby_blue" => Color::srgba(0.54, 0.81, 0.94, 1.), // Baby blue
+        "lime_green" => Color::srgba(0.60, 1.0, 0.60, 1.), // Lime Green
         _ => Color::WHITE, // Default color
+
+        // _ => Color::srgba(1.0, 0.84, 0.87, 1.0), // For testing colors
     }
 }
 

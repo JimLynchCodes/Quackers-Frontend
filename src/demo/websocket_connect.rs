@@ -1,4 +1,5 @@
 use std::{io::ErrorKind, net::TcpStream};
+use std::env;
 
 use bevy::{
     ecs::world::CommandQueue,
@@ -8,6 +9,8 @@ use bevy::{
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tungstenite::{connect, http::Response, stream::MaybeTlsStream, Message, WebSocket};
+// use rustls::CryptoProvider;
+use url::Url;
 
 use strum_macros::EnumString;
 
@@ -201,7 +204,16 @@ fn setup_connection(
                 let pool = AsyncComputeTaskPool::get();
                 let entity = commands.spawn_empty().id();
                 let task = pool.spawn(async move {
-                    let mut client = connect("ws://127.0.0.1:8000/ws")?;
+                    
+                    // CryptoProvider::install_default()?;
+
+                    // let backend_endpoint = Url::parse(&env::var("BACKEND_WS_ENDPOINT") // read from env var if it exists
+                    // .unwrap_or("ws://127.0.0.1:8000/ws")).unwrap(); // if env is not set, try connecting to local websocket server
+
+                    let backend_endpoint_s = &env::var("BACKEND_WS_ENDPOINT") // read from env var if it exists
+                    .unwrap_or("ws://127.0.0.1:8000/ws".to_string());
+
+                    let mut client = connect(backend_endpoint_s)?;
                     match client.0.get_mut() {
                         MaybeTlsStream::Plain(p) => p.set_nonblocking(true)?,
                         MaybeTlsStream::Rustls(stream_owned) => {
