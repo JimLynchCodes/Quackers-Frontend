@@ -161,6 +161,25 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang libclang-dev build-essential
 
+      - name: Install dependencies (Linux)
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            clang \
+            libclang-dev \
+            build-essential \
+            libc6-dev \
+            libstdc++-12-dev
+
+      - name: Install bindgen and other wasm tools
+        run: |
+          cargo install bindgen-cli wasm-bindgen-cli
+
+      - name: Set external bindgen for AWS LC Sys
+        run: |
+          export AWS_LC_SYS_EXTERNAL_BINDGEN=1
+
       - name: (new step) Install libc development package
         run: |
           sudo apt-get install -y libc6-dev
