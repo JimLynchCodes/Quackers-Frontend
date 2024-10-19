@@ -79,6 +79,7 @@ jobs:
       - get-version
     env:
       version: ${{ needs.get-version.outputs.version }}
+      backend_ws_endpoint: ${{ secrets.BACKEND_WS_ENDPOINT }}
     strategy:
       matrix:
         include:
@@ -89,26 +90,26 @@ jobs:
             package_ext: .zip
             runner: ubuntu-latest
 
-          - platform: linux
-            targets: x86_64-unknown-linux-gnu
-            profile: release-native
-            features: bevy/wayland
-            package_ext: .zip
-            runner: ubuntu-latest
+          # - platform: linux
+          #   targets: x86_64-unknown-linux-gnu
+          #   profile: release-native
+          #   features: bevy/wayland
+          #   package_ext: .zip
+          #   runner: ubuntu-latest
 
-          - platform: windows
-            targets: x86_64-pc-windows-msvc
-            profile: release-native
-            binary_ext: .exe
-            package_ext: .zip
-            runner: windows-latest
+          # - platform: windows
+          #   targets: x86_64-pc-windows-msvc
+          #   profile: release-native
+          #   binary_ext: .exe
+          #   package_ext: .zip
+          #   runner: windows-latest
 
-          - platform: macos
-            targets: x86_64-apple-darwin aarch64-apple-darwin
-            profile: release-native
-            app_suffix: .app/Contents/MacOS
-            package_ext: .dmg
-            runner: macos-latest
+          # - platform: macos
+          #   targets: x86_64-apple-darwin aarch64-apple-darwin
+          #   profile: release-native
+          #   app_suffix: .app/Contents/MacOS
+          #   package_ext: .dmg
+          #   runner: macos-latest
     runs-on: ${{ matrix.runner }}
     permissions:
       # Required to create a GitHub release: https://docs.github.com/en/rest/releases/releases#create-a-release
@@ -154,6 +155,37 @@ jobs:
       - name: Install dependencies (Linux)
         if: ${{ matrix.platform == 'linux' }}
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev libwayland-dev libxkbcommon-dev
+
+      - name: (new step) Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang libclang-dev build-essential
+
+      - name: Install dependencies (Linux)
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            clang \
+            libclang-dev \
+            build-essential \
+            libc6-dev \
+            libstdc++-12-dev
+
+      - name: Install bindgen and other wasm tools
+        run: |
+          cargo install bindgen-cli wasm-bindgen-cli
+
+      - name: Set external bindgen for AWS LC Sys
+        run: |
+          export AWS_LC_SYS_EXTERNAL_BINDGEN=1
+
+      - name: (new step) Install libc development package
+        run: |
+          sudo apt-get install -y libc6-dev
+
+      - name: (new step) Install Wasm32 Target
+        run: rustup target add wasm32-unknown-unknown
 
       - name: Prepare output directories
         run: rm -rf tmp; mkdir -p tmp/binary '${{ env.app }}'
