@@ -51,6 +51,16 @@ git tag
 ```
 
 
+
+## Local WASM Build
+Note: Only really necesary for debuggin ci build errors
+
+might need this:
+```bash
+cargo install bindgen-cli
+```
+
+
 ## Files
 
 project structure:

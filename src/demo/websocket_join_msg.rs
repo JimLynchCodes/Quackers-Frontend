@@ -4,7 +4,7 @@ use bevy::
     prelude::*
 ;
 use serde::{Deserialize, Serialize};
-use tungstenite::Message;
+// use tungstenite::Message;
 
 #[derive(Serialize, Deserialize)]
 struct TransformData {
@@ -17,36 +17,36 @@ pub(super) fn plugin(app: &mut App) {
 
     app.add_event::<JoinRequestEvent>();
 
-    app.add_systems(Update, join_request_bevy_event_listener);
+    // app.add_systems(Update, join_request_bevy_event_listener);
 }
 
-use super::websocket_connect::WebSocketClient;
+// use super::websocket_connect::WebSocketClient;
 
 #[derive(Event)]
 pub struct JoinRequestEvent(pub String);
 
 // Listens for bevy events for ws messages and fires them off to the server
-fn join_request_bevy_event_listener(
-    mut ev_join_request: EventReader<JoinRequestEvent>,
-    mut entities_with_client: Query<(&mut WebSocketClient,)>,
-) {
-    for ev in ev_join_request.read() {
-        println!("heard join request bevy event");
-        for mut client in entities_with_client.iter_mut() {
-            println!("sending join request ws msg");
-            let message = build_join_request_msg(ev.0.clone());
+// fn join_request_bevy_event_listener(
+//     mut ev_join_request: EventReader<JoinRequestEvent>,
+//     mut entities_with_client: Query<(&mut WebSocketClient,)>,
+// ) {
+//     for ev in ev_join_request.read() {
+//         println!("heard join request bevy event");
+//         for mut client in entities_with_client.iter_mut() {
+//             println!("sending join request ws msg");
+//             let message = build_join_request_msg(ev.0.clone());
 
-            match client.0 .0 .0.send(Message::text(message)) {
-                Ok(_) => info!("Join request ws msg successfully sent to server!"),
-                Err(tungstenite::Error::Io(e)) if e.kind() == ErrorKind::WouldBlock => { /* ignore */
-                }
-                Err(e) => {
-                    warn!("Could not send the message: {e:?}");
-                }
-            }
-        }
-    }
-}
+//             match client.0 .0 .0.send(Message::text(message)) {
+//                 Ok(_) => info!("Join request ws msg successfully sent to server!"),
+//                 Err(tungstenite::Error::Io(e)) if e.kind() == ErrorKind::WouldBlock => { /* ignore */
+//                 }
+//                 Err(e) => {
+//                     warn!("Could not send the message: {e:?}");
+//                 }
+//             }
+//         }
+//     }
+// }
 
 #[derive(serde::Serialize)]
 struct JoinRequestData {

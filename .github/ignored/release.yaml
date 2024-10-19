@@ -180,12 +180,12 @@ jobs:
         run: |
           export AWS_LC_SYS_EXTERNAL_BINDGEN=1
 
-      - name: (new step) Install libc development package
-        run: |
-          sudo apt-get install -y libc6-dev
+      # - name: (new step) Install libc development package
+      #   run: |
+      #     sudo apt-get install -y libc6-dev
 
-      - name: (new step) Install Wasm32 Target
-        run: rustup target add wasm32-unknown-unknown
+      # - name: (new step) Install Wasm32 Target
+      #   run: rustup target add wasm32-unknown-unknown
 
       - name: Prepare output directories
         run: rm -rf tmp; mkdir -p tmp/binary '${{ env.app }}'
