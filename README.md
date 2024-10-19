@@ -38,6 +38,19 @@ BACKEND_WS_ENDPOINT =
 The key from itch.io so ci can upload builds
 BUTLER_CREDENTIALS = 
 
+
+then set a new git tag that begins with "v" and push it:
+```bash
+git tag <name>
+git push --tags
+```
+
+view tags:
+```
+git tag
+```
+
+
 ## Files
 
 project structure:

@@ -38,8 +38,6 @@ env:
   # Must contain only A-Z, a-z, 0-9, hyphen, and period: https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundleidentifier
   app_id: jimlynchcodes.ducks-test
 
-  BACKEND_WS_ENDPOINT: ${{ secrets.BACKEND_WS_ENDPOINT }}
-
   # The base filename of the binary in the package produced by this workflow.
   # Applies to Windows, macOS, and Linux releases.
   # Defaults to `cargo_build_binary_name` if commented out.
@@ -81,7 +79,7 @@ jobs:
       - get-version
     env:
       version: ${{ needs.get-version.outputs.version }}
-      backend_ws_endpoint: ${{ env.app_id }}
+      backend_ws_endpoint: ${{ secrets.BACKEND_WS_ENDPOINT }}
     strategy:
       matrix:
         include:
