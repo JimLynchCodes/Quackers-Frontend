@@ -29,6 +29,15 @@ export BACKEND_WS_ENDPOINT=wss://quackers-beta.jimlynchcodes.com/ws
 
 </details>
 
+
+To Deploy, first set your github secrets:
+
+The wss endpoint for your running server 
+BACKEND_WS_ENDPOINT = 
+
+The key from itch.io so ci can upload builds
+BUTLER_CREDENTIALS = 
+
 ## Files
 
 project structure:
