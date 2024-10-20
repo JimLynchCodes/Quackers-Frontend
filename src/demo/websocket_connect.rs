@@ -10,7 +10,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 // use tungstenite::{connect, http::Response, stream::MaybeTlsStream, Message, WebSocket};
 // use rustls::CryptoProvider;
-use url::Url;
 
 use strum_macros::EnumString;
 
@@ -173,8 +172,6 @@ fn actually_connect(
 ) {
     ev_connect.send(WebSocketConnectionEvents::SetupConnection);
 }
-
-use thiserror::Error;
 
 use crate::demo::other_player::DuckDirection;
 
