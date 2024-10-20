@@ -13,19 +13,22 @@
 //! purposes. If you want to move the player in a smoother way,
 //! consider using a [fixed timestep](https://github.com/bevyengine/bevy/blob/main/examples/movement/physics_in_fixed_timestep.rs).
 
-use bevy::{prelude::*, window::PrimaryWindow};
+use bevy::prelude::*;
 
 use crate::AppSet;
 
-pub(super) fn plugin(app: &mut App) {
-    app.register_type::<(MovementController, ScreenWrap)>();
+use super::websocket_move_msg::MoveRequestEvent;
 
-    app.add_systems(
-        Update,
-        (apply_movement, apply_screen_wrap)
-            .chain()
-            .in_set(AppSet::Update),
-    );
+pub const MIN_X_POS: f32 = -1000.;
+pub const MIN_Y_POS: f32 = -1000.;
+
+pub const MAX_X_POS: f32 = 1000.;
+pub const MAX_Y_POS: f32 = 1000.;
+
+pub(super) fn plugin(app: &mut App) {
+    app.register_type::<MovementController>();
+
+    app.add_systems(Update, apply_movement.chain().in_set(AppSet::Update));
 }
 
 /// These are the movement parameters for our character controller.
@@ -55,30 +58,58 @@ impl Default for MovementController {
 
 fn apply_movement(
     time: Res<Time>,
-    mut movement_query: Query<(&MovementController, &mut Transform)>,
+    mut param_set: ParamSet<(
+        Query<(&MovementController, &mut Transform)>,
+        Query<&mut Transform, With<Camera>>,
+    )>,
+    mut move_request_event_writer: EventWriter<MoveRequestEvent>
 ) {
-    for (controller, mut transform) in &mut movement_query {
+    let mut translation = Vec3 {
+        x: 0.,
+        y: 0.,
+        z: 0.,
+    };
+
+    for (controller, mut transform) in &mut param_set.p0().iter_mut() {
         let velocity = controller.max_speed * controller.intent;
         transform.translation += velocity.extend(0.0) * time.delta_seconds();
+        translation = velocity.extend(0.0) * time.delta_seconds();
+
+        if transform.translation.x < MIN_X_POS {
+            transform.translation.x = MIN_X_POS
+        }
+        if transform.translation.y < MIN_Y_POS {
+            transform.translation.y = MIN_Y_POS
+        }
+        if transform.translation.x > MAX_X_POS {
+            transform.translation.x = MAX_X_POS
+        }
+        if transform.translation.y > MAX_Y_POS {
+            transform.translation.y = MAX_Y_POS
+        }
     }
-}
 
-#[derive(Component, Reflect)]
-#[reflect(Component)]
-pub struct ScreenWrap;
+    // No need to ping server and update camera if no change
+    if !(translation.x == 0. && translation.y == 0.) {   
+        for mut camera in &mut param_set.p1().iter_mut() {
+            camera.translation += translation;
 
-fn apply_screen_wrap(
-    window_query: Query<&Window, With<PrimaryWindow>>,
-    mut wrap_query: Query<&mut Transform, With<ScreenWrap>>,
-) {
-    let Ok(window) = window_query.get_single() else {
-        return;
-    };
-    let size = window.size() + 256.0;
-    let half_size = size / 2.0;
-    for mut transform in &mut wrap_query {
-        let position = transform.translation.xy();
-        let wrapped = (position + half_size).rem_euclid(size) - half_size;
-        transform.translation = wrapped.extend(transform.translation.z);
+            // Keep camera movement within bounds
+            if camera.translation.x < MIN_X_POS {
+                camera.translation.x = MIN_X_POS
+            }
+            if camera.translation.y < MIN_Y_POS {
+                camera.translation.y = MIN_Y_POS
+            }
+            if camera.translation.x > MAX_X_POS {
+                camera.translation.x = MAX_X_POS
+            }
+            if camera.translation.y > MAX_Y_POS {
+                camera.translation.y = MAX_Y_POS
+            }
+            
+            // send movement request to ws server
+            move_request_event_writer.send(MoveRequestEvent(translation.x, translation.y));
+        }
     }
 }

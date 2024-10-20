@@ -3,7 +3,7 @@
 use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 
 use crate::{
-    asset_tracking::LoadResource, audio::Music, demo::level::spawn_level as spawn_level_command,
+    asset_tracking::LoadResource, audio::Music, demo::{level::spawn_level as spawn_level_command, websocket_join_msg::JoinRequestEvent},
     screens::Screen,
 };
 
@@ -11,8 +11,11 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Screen::Gameplay), spawn_level);
 
     app.load_resource::<GameplayMusic>();
-    app.add_systems(OnEnter(Screen::Gameplay), play_gameplay_music);
-    app.add_systems(OnExit(Screen::Gameplay), stop_music);
+
+    // TODO - add ack world music
+
+    // app.add_systems(OnEnter(Screen::Gameplay), play_gameplay_music);
+    // app.add_systems(OnExit(Screen::Gameplay), stop_music);
 
     app.add_systems(
         Update,
@@ -21,8 +24,10 @@ pub(super) fn plugin(app: &mut App) {
     );
 }
 
-fn spawn_level(mut commands: Commands) {
+fn spawn_level(mut commands: Commands,  mut join_request_event_writer: EventWriter<JoinRequestEvent>) {
     commands.add(spawn_level_command);
+    println!("sending joiner request event");
+    join_request_event_writer.send(JoinRequestEvent("hello".to_string()));
 }
 
 #[derive(Resource, Asset, Reflect, Clone)]

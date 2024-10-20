@@ -8,9 +8,14 @@ mod theme;
 
 use bevy::{
     asset::AssetMetaCheck,
-    audio::{AudioPlugin, Volume},
+    audio::{AudioPlugin, SpatialScale, Volume},
     prelude::*,
 };
+
+/// Spatial audio uses the distance to attenuate the sound volume. In 2D with the default camera,
+/// 1 pixel is 1 unit of distance, so we use a scale so that 100 pixels is 1 unit of distance for
+/// audio.
+const AUDIO_SCALE: f32 = 1. / 500.0;
 
 pub struct AppPlugin;
 
@@ -37,7 +42,7 @@ impl Plugin for AppPlugin {
                 })
                 .set(WindowPlugin {
                     primary_window: Window {
-                        title: "Quackers Beta".to_string(),
+                        title: "Ducks Test".to_string(),
                         canvas: Some("#bevy".to_string()),
                         fit_canvas_to_parent: true,
                         prevent_default_event_handling: true,
@@ -50,6 +55,7 @@ impl Plugin for AppPlugin {
                     global_volume: GlobalVolume {
                         volume: Volume::new(0.3),
                     },
+                    default_spatial_scale: SpatialScale::new_2d(AUDIO_SCALE),
                     ..default()
                 }),
         );

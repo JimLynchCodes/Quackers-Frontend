@@ -23,6 +23,48 @@ serde_json = "1.0.132"
 bevy_kira_audio = "0.20.0"
 bevy_shapes = "0.0.1"
 
+strum = "0.26.3"
+strum_macros = "0.26.4"
+
+http = "1.1"
+httparse = "1.3"
+futures-util = { version = "0.3", default-features = false, features = [
+    "sink",
+    "std",
+] }
+
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio-tungstenite = "0.24"
+tokio = { version = "1.40", default-features = false, features = ["net"] }
+native-tls = { version = "0.2", default-features = false, optional = true }
+rustls = { version = "0.23.15", default-features = false, optional = true }
+
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2"
+js-sys = "0.3"
+futures-channel = { version = "0.3" }
+
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.web-sys]
+version = "0.3"
+features = [
+    "WebSocket",
+    "MessageEvent",
+    "CloseEvent",
+    "Event",
+    "ErrorEvent",
+    "BinaryType",
+    "Blob",
+]
+
+[dev-dependencies]
+assert-impl = "0.1"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+tokio = { version = "1.36", features = ["full"] }
+
 [features]
 default = [
     # Default to a native dev build.
@@ -58,6 +100,7 @@ type_complexity = "allow"
 # Enable a small amount of optimization in the dev profile.
 [profile.dev]
 opt-level = 1
+incremental = true
 
 # Enable a large amount of optimization in the dev profile for dependencies.
 [profile.dev.package."*"]
