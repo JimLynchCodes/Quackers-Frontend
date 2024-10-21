@@ -8,13 +8,9 @@ edition = "2021"
 bevy = { version = "0.14", features = ["wayland"] }
 rand = "0.8"
 # Compile low-severity logs out of native builds for performance.
-log = { version = "0.4", features = [
-    "max_level_debug",
-    "release_max_level_warn",
-] }
+log = { version = "0.4", features = [ "release_max_level_warn"] }
 # Compile low-severity logs out of web builds for performance.
 tracing = { version = "0.1", features = [
-    "max_level_debug",
     "release_max_level_warn",
 ] }
 virtual_joystick = "2.3.0"
@@ -25,6 +21,7 @@ bevy_shapes = "0.0.1"
 
 strum = "0.26.3"
 strum_macros = "0.26.4"
+polling = { version = "3.7.3"}
 
 http = "1.1"
 httparse = "1.3"
@@ -32,11 +29,18 @@ futures-util = { version = "0.3", default-features = false, features = [
     "sink",
     "std",
 ] }
-
+tokio-tungstenite-wasm = "0.3.1"
+tokio = { version = "1.39.3", features = ["io-util"] }
+wasm-logger = "0.2.0"
+wasm-bindgen-futures = "0.4.45"
+crossbeam = "0.8.4"
+crossbeam-channel = "0.5.13"
+url = "2.5.2"
+# tokio = { version = "1.40.0", features = ["wasm", "io-util"] }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio-tungstenite = "0.24"
-tokio = { version = "1.40", default-features = false, features = ["net"] }
+tokio = { version = "1.39.3", default-features = false, features = ["net"] }
 native-tls = { version = "0.2", default-features = false, optional = true }
 rustls = { version = "0.23.15", default-features = false, optional = true }
 
@@ -101,14 +105,11 @@ type_complexity = "allow"
 [profile.dev]
 opt-level = 1
 incremental = true
+debug = false
 
 # Enable a large amount of optimization in the dev profile for dependencies.
 [profile.dev.package."*"]
 opt-level = 3
-
-# Remove expensive debug assertions due to <https://github.com/bevyengine/bevy/issues/14291>
-[profile.dev.package.wgpu-types]
-debug-assertions = false
 
 # The default profile is optimized for Wasm builds because
 # that's what [Trunk reads](https://github.com/trunk-rs/trunk/issues/605).

@@ -12,6 +12,11 @@ use bevy::{
     prelude::*,
 };
 
+
+use log::Level;
+use wasm_logger;
+
+
 /// Spatial audio uses the distance to attenuate the sound volume. In 2D with the default camera,
 /// 1 pixel is 1 unit of distance, so we use a scale so that 100 pixels is 1 unit of distance for
 /// audio.
@@ -21,6 +26,14 @@ pub struct AppPlugin;
 
 impl Plugin for AppPlugin {
     fn build(&self, app: &mut App) {
+
+        // wasm_logger::init(wasm_logger::Config::default());
+
+        // // Logging
+        // log::info!("Some info");
+        // log::trace!("Some trace");
+        // log::error!("Error message");
+
         // Order new `AppStep` variants by adding them here:
         app.configure_sets(
             Update,
