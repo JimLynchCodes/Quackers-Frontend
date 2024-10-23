@@ -295,6 +295,7 @@ pub struct GenericIncomingRequest {
 // }
 
 use crate::demo::other_player::DuckDirection;
+use crate::demo::websocket_join_msg::build_join_request_msg;
 
 use super::{cracker::YouGotCrackerSoundFx, other_player::OtherPlayerData};
 
@@ -390,7 +391,7 @@ mod wasm_websocket {
 }
 
 #[derive(Component)]
-struct WebSocketClient(
+pub struct WebSocketClient(
     #[cfg(target_arch = "wasm32")] 
     send_wrapper::SendWrapper<wasm_websocket::Client>,
     #[cfg(not(target_arch = "wasm32"))]
@@ -469,7 +470,8 @@ fn setup_connection(
 
                 // Define the message to send
                 let message = MyMessage::new("Hello, WebSocket!".to_string());
-                let json_message = serde_json::to_string(&message).unwrap();
+                // let json_message = serde_json::to_string(&message).unwrap();
+                let json_message = build_join_request_msg("foo".to_string());                
 
                 #[cfg(not(target_arch = "wasm32"))]
                 {
@@ -579,12 +581,16 @@ fn send_info(
         for (mut client,) in entities_with_client.iter_mut() {
             let transforms = &some_data.iter().map(|x| x.0.clone()).collect::<Vec<_>>();
             info!("Sending data: {transforms:?}");
-            let msg = bincode::serialize(transforms).unwrap();
+            // let msg = bincode::serialize(transforms).unwrap();
+            let json_message = build_join_request_msg("foo".to_string());    
             #[cfg(target_arch = "wasm32")]
             {
 
-                let message = MyMessage::new("Hello, WebSocket!".to_string());
-                let json_message = serde_json::to_string(&message).unwrap();
+                // let message = MyMessage::new("Hello, WebSocket!".to_string());
+                // let json_message = serde_json::to_string(&message).unwrap();
+
+                // let message = MyMessage::new("Hello, WebSocket!".to_string());
+                // let json_message = serde_json::to_string(&message).unwrap();
 
                 match client.0.socket.send_with_str(&json_message) {
                     Ok(_) => web_sys::console::log_1(&"Message sent successfully".into()),
@@ -596,7 +602,7 @@ fn send_info(
             }
             #[cfg(not(target_arch = "wasm32"))]
             {
-                match client.0 .0.send(Message::Binary(msg)) {
+                match client.0 .0.send(Message::Text(json_message)) {
                     Ok(_) => info!("Data successfully sent!"),
                     #[cfg(not(target_arch = "wasm32"))]
                     Err(tungstenite::Error::Io(e)) if e.kind() == ErrorKind::WouldBlock => { /* ignore */
