@@ -5,7 +5,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bevy = { version = "0.14", features = ["wayland"] }
+bevy = { version = "0.14", features = ["serialize"] }
 rand = "0.8"
 # Compile low-severity logs out of native builds for performance.
 log = { version = "0.4", features = [
@@ -26,12 +26,14 @@ bevy_shapes = "0.0.1"
 strum = "0.26.3"
 strum_macros = "0.26.4"
 
-
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = "0.2"
 js-sys = "0.3"
 futures-channel = { version = "0.3" }
 
+[target.'cfg(target_arch="wasm32")'.dependencies]
+web-sys = { version = "0.3.72", features = ["WebSocket", "EventTarget", "MessageEvent", "BinaryType"] }
+send_wrapper = "0.6.0"
 
 [dev-dependencies]
 assert-impl = "0.1"
@@ -83,10 +85,6 @@ incremental = true
 # Enable a large amount of optimization in the dev profile for dependencies.
 [profile.dev.package."*"]
 opt-level = 3
-
-# Remove expensive debug assertions due to <https://github.com/bevyengine/bevy/issues/14291>
-[profile.dev.package.wgpu-types]
-debug-assertions = false
 
 # The default profile is optimized for Wasm builds because
 # that's what [Trunk reads](https://github.com/trunk-rs/trunk/issues/605).
