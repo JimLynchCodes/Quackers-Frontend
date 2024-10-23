@@ -4,6 +4,8 @@ use bevy::
     prelude::*
 ;
 use serde::{Deserialize, Serialize};
+
+use super::websocket_connect::WebSocketClient;
 // use tungstenite::Message;
 
 #[derive(Serialize, Deserialize)]
@@ -59,7 +61,7 @@ struct JoinRequest {
     data: JoinRequestData,
 }
 
-fn build_join_request_msg(friendly_name: String) -> String {
+pub fn build_join_request_msg(friendly_name: String) -> String {
     let join_request_hardcoded = JoinRequest {
         action_type: "join".to_string(),
         data: JoinRequestData {
