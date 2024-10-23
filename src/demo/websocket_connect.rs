@@ -14,6 +14,10 @@ use std::{
     sync::{Arc, Mutex},
     time::Duration,
 };
+
+// #[cfg(target_arch = "wasm32")]
+// use wasm_bindgen::JsValue;
+
 // use tungstenite::{connect, http::Response, stream::MaybeTlsStream, Message, WebSocket};
 // use rustls::CryptoProvider;
 
@@ -182,7 +186,7 @@ pub struct OtherPlayerMovedWsReceived {
     pub data: Value,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, Event)]
 pub struct GenericIncomingRequest {
     pub action_type: S2CActionTypes,
     pub data: Value,
@@ -347,9 +351,11 @@ mod wasm_websocket {
         BinaryType, Event, MessageEvent,
     };
 
+    use wasm_bindgen::JsValue;
+
     pub struct Client {
         pub socket: web_sys::WebSocket,
-        pub recv_queue: Rc<RefCell<VecDeque<Vec<u8>>>>,
+        pub recv_queue: Rc<RefCell<VecDeque<JsValue>>>,
         _open_cb: Closure<dyn FnMut(Event)>,
         _message_cb: Closure<dyn FnMut(MessageEvent)>,
     }
@@ -370,11 +376,17 @@ mod wasm_websocket {
                 let recv_queue = Rc::clone(&recv_queue);
                 move |event: MessageEvent| {
                     web_sys::console::log_1(&format!("Got message: {:?}", event.data()).into());
-                    if let Some(buf) = event.data().dyn_ref::<ArrayBuffer>() {
-                        recv_queue
-                            .borrow_mut()
-                            .push_back(Uint8Array::new(buf).to_vec());
-                    }
+                    // if let Some(buf) = event.data().dyn_ref::<ArrayBuffer>() {
+
+                    let data_vec = Uint8Array::new(&event.data().into()).to_vec();
+                    web_sys::console::log_1(&format!("Pushin it!: {:?}", event.data()).into());
+                    web_sys::console::log_1(&format!("Pushin vec!: {:?}", data_vec).into());
+                    web_sys::console::log_1(
+                        &format!("as a string!: {:?}", event.data().as_string()).into(),
+                    );
+
+                    recv_queue.borrow_mut().push_back(event.data().clone());
+                    // }
                 }
             });
             socket
@@ -392,8 +404,7 @@ mod wasm_websocket {
 
 #[derive(Component)]
 pub struct WebSocketClient(
-    #[cfg(target_arch = "wasm32")] 
-    send_wrapper::SendWrapper<wasm_websocket::Client>,
+    #[cfg(target_arch = "wasm32")] send_wrapper::SendWrapper<wasm_websocket::Client>,
     #[cfg(not(target_arch = "wasm32"))]
     (
         WebSocket<MaybeTlsStream<TcpStream>>,
@@ -471,7 +482,7 @@ fn setup_connection(
                 // Define the message to send
                 let message = MyMessage::new("Hello, WebSocket!".to_string());
                 // let json_message = serde_json::to_string(&message).unwrap();
-                let json_message = build_join_request_msg("foo".to_string());                
+                let json_message = build_join_request_msg("foo".to_string());
 
                 #[cfg(not(target_arch = "wasm32"))]
                 {
@@ -506,22 +517,20 @@ fn setup_connection(
                 }
                 #[cfg(target_arch = "wasm32")]
                 {
-
                     web_sys::console::log_1(&"//1 wasm connecting".into());
                     // Use the ewebsock or wasm-websocket client to send the message
                     let client = wasm_websocket::Client::new(url);
                     web_sys::console::log_1(&"//1 wasm connected".into());
 
-
                     // let message = MyMessage::new("Hello, WebSocket!".to_string());
                     // let json_message = serde_json::to_string(&message).unwrap();
-                    
+
                     // let msg = bincode::serialize(&json_message).unwrap();
-                    
+
                     // web_sys::console::log_1(&"//wasm built message".into());
                     // web_sys::console::log_1(&client.socket.into());
                     // client.socket.send(json_message);
-                    
+
                     // client.socket.send_info(msg);
                     // let _ = client.socket.send_with_str(&json_message);
                     // match client.socket.send_with_str(&json_message) {
@@ -531,13 +540,10 @@ fn setup_connection(
 
                     // client
 
-
                     // web_sys::console::log_1(&"//wasm sent message".into());
                     // client.send(json_message);
 
-                    commands
-                        .entity(entity)
-                        .insert(WebSocketClient(client));
+                    commands.entity(entity).insert(WebSocketClient(client));
                 }
             }
         }
@@ -582,10 +588,9 @@ fn send_info(
             let transforms = &some_data.iter().map(|x| x.0.clone()).collect::<Vec<_>>();
             info!("Sending data: {transforms:?}");
             // let msg = bincode::serialize(transforms).unwrap();
-            let json_message = build_join_request_msg("foo".to_string());    
+            let json_message = build_join_request_msg("foo".to_string());
             #[cfg(target_arch = "wasm32")]
             {
-
                 // let message = MyMessage::new("Hello, WebSocket!".to_string());
                 // let json_message = serde_json::to_string(&message).unwrap();
 
@@ -594,7 +599,9 @@ fn send_info(
 
                 match client.0.socket.send_with_str(&json_message) {
                     Ok(_) => web_sys::console::log_1(&"Message sent successfully".into()),
-                    Err(err) => web_sys::console::log_1(&format!("Error sending message: {:?}", err).into()),
+                    Err(err) => {
+                        web_sys::console::log_1(&format!("Error sending message: {:?}", err).into())
+                    }
                 }
 
                 // TODO: do some handling so we know whether the websocket is connected yet
@@ -616,12 +623,51 @@ fn send_info(
     }
 }
 
-fn recv_info(mut q: Query<(&mut WebSocketClient,)>) {
+fn recv_info(
+    mut q: Query<(&mut WebSocketClient,)>,
+    mut bevy_event_writer_you_joined: EventWriter<YouJoinedWsReceived>,
+    // mut bevy_event_writer_generic_message: EventWriter<GenericIncomingRequest>,
+) {
+    // let generic_msg =
+    //                     serde_json::from_str(&m.to_text().unwrap()).unwrap_or_else(|op| {
+    //                         info!("Failed to parse incoming websocket message: {}", op);
+    //                         GenericIncomingRequest {
+    //                             action_type: S2CActionTypes::Empty,
+    //                             data: Value::Null,
+    //                         }
+    //                     });
+
+    //                 match generic_msg.action_type {
     for (mut client,) in q.iter_mut() {
         #[cfg(not(target_arch = "wasm32"))]
         {
             match client.0 .0.read() {
-                Ok(m) => info!("Received message {m:?}"),
+                Ok(m) => {
+                    info!("Received message {m:?}");
+
+                    let generic_msg =
+                        serde_json::from_str(&m.to_text().unwrap()).unwrap_or_else(|op| {
+                            info!("Failed to parse incoming websocket message: {}", op);
+                            GenericIncomingRequest {
+                                action_type: S2CActionTypes::Empty,
+                                data: Value::Null,
+                            }
+                        });
+
+                    match generic_msg.action_type {
+                        S2CActionTypes::YouJoined => {
+                            info!("Received 'YouJoined' message from ws server!");
+                            bevy_event_writer_you_joined.send(YouJoinedWsReceived {
+                                data: generic_msg.data,
+                            });
+                        }
+                        _ => (),
+                    }
+
+                    // bevy_event_writer_you_joined.send(generic_msg);
+
+                    // handle_incoming_ws_message(generic_msg, bevy_event_writer_you_joined);
+                }
                 Err(tungstenite::Error::Io(e)) if e.kind() == ErrorKind::WouldBlock => { /* ignore */
                 }
                 Err(e) => warn!("error receiving: {e}"),
@@ -629,12 +675,171 @@ fn recv_info(mut q: Query<(&mut WebSocketClient,)>) {
         }
         #[cfg(target_arch = "wasm32")]
         {
+            // info!("Queue {:?}", client.0.recv_queue.length);
+
             while let Some(m) = client.0.recv_queue.borrow_mut().pop_front() {
-                info!("Received message {m:?}")
+                web_sys::console::log_1(&format!("Received message {:?}", m).into());
+
+                if let Some(json_str) = m.as_string() {
+                    // If the JsValue is a string, parse it as JSON using serde_json::from_str
+                    let generic_msg: GenericIncomingRequest = serde_json::from_str(&json_str)
+                        .unwrap_or_else(|err| {
+                            web_sys::console::log_1(
+                                &format!("Failed to parse JSON string: {:?}", err).into(),
+                            );
+                            // Fallback to a default empty message if parsing fails
+                            GenericIncomingRequest {
+                                action_type: S2CActionTypes::Empty,
+                                data: Value::Null,
+                            }
+                        });
+
+                    web_sys::console::log_1(
+                        &format!("Parsed message from string: {:?}", generic_msg).into(),
+                    );
+
+                    match generic_msg.action_type {
+                        S2CActionTypes::YouJoined => {
+                            info!("Received 'YouJoined' message from ws server!");
+                            bevy_event_writer_you_joined.send(YouJoinedWsReceived {
+                                data: generic_msg.data,
+                            });
+                        }
+                        _ => (),
+                    }
+                } 
+                // else {
+                //     // Step 2: If it's not a string, attempt to deserialize the JsValue directly
+                //     let generic_msg: GenericIncomingRequest = serde_wasm_bindgen::from_value(m)
+                //         .unwrap_or_else(|err| {
+                //             web_sys::console::log_1(
+                //                 &format!("Failed to deserialize JsValue: {:?}", err).into(),
+                //             );
+                //             // Fallback to a default empty message if deserialization fails
+                //             GenericIncomingRequest {
+                //                 action_type: S2CActionTypes::Empty,
+                //                 data: Value::Null,
+                //             }
+                //         });
+
+                //     web_sys::console::log_1(
+                //         &format!("Parsed message from JsValue object: {:?}", generic_msg).into(),
+                //     );
+                // }
+
+                // let parsed_msg: GenericIncomingRequest = match web_sys::js_sys::JSON::parse(m) {
+                //     Ok(parsed) => {
+
+                //         web_sys::console::log_1(&format!("parsed JSON: {:?}", err).into());
+                //         parsed
+                //     },
+                //     Err(err) => {
+                //         web_sys::console::log_1(&format!("Failed to parse JSON: {:?}", err).into());
+                //         return;
+                //     }
+                // };
+
+                // let parsed_msg = match m.from_serde()  {
+                //     Ok(parsed) => parsed,
+                //     Err(err) => {
+                //         web_sys::console::log_1(&format!("Failed to parse JSON: {:?}", err).into());
+                //         return;
+                //     }
+                // };
+
+                // if let Some(stringified) = m.as_string() {
+                //     web_sys::console::log_1(&format!("Stringified it: {:?}", stringified).into());
+
+                // let generic_msg: GenericIncomingRequest = serde_json::from_str(&stringified)
+                //     .unwrap_or_else(|err| {
+                //         web_sys::console::log_1(
+                //             &format!("Failed to parse incoming websocket message: {:?}", err)
+                //                 .into(),
+                //         );
+                //         // Fallback to a default empty message if deserialization fails
+                //         GenericIncomingRequest {
+                //             action_type: S2CActionTypes::Empty,
+                //             data: Value::Null,
+                //         }
+                //     });
+
+                // web_sys::console::log_1(
+                //     &format!(
+                //         "Parsed a generic message. action type is! {:?}",
+                //         &generic_msg.action_type
+                //     )
+                //     .into(),
+                // );
+
+                // // bevy_event_writer_generic_message.send(generic_msg);
+
+                // match generic_msg.action_type {
+                //     S2CActionTypes::YouJoined => {
+                //         info!("Received 'YouJoined' message from ws server!");
+                //         bevy_event_writer_you_joined.send(YouJoinedWsReceived {
+                //             data: generic_msg.data,
+                //         });
+                //     }
+                //     _ => (),
+                // }
+                // }
+
+                // serde_json::from_str();
+
+                // let generic_msg = match m {
+                //     Ok()
+                // }
+                // serde_json::from_str(&m).unwrap_or_else(|op| {
+                //     info!("Failed to parse incoming websocket message: {}", op);
+                //     GenericIncomingRequest {
+                //         action_type: S2CActionTypes::Empty,
+                //         data: Value::Null,
+                //     }
+                // });
+                // bevy_event_writer_generic_message.send(generic_msg);
+
+                // match generic_msg.action_type {
+                //     S2CActionTypes::YouJoined => {
+                //         info!("Received 'YouJoined' message from ws server!");
+                //         bevy_event_writer_you_joined.send(YouJoinedWsReceived {
+                //             data: generic_msg.data,
+                //         });
+                //     }
+                //     _ => (),
+                // }
             }
         }
     }
 }
+
+// fn handle_generic_incoming_ws_message()
+//     mut ev_connect: EventReader<GenericIncomingRequest>,
+//     mut commands: Commands,
+//     mut receiver_sender: ResMut<UnboundedSender<WebSocketMessage>>, // Channel for outgoing messages
+// ) {
+//     for generic_msg in ev_connect.read() {
+
+//         match generic_msg {
+//             _ =>
+//         }
+
+//     }
+// )
+
+// fn handle_incoming_ws_message(
+//     generic_msg: GenericIncomingRequest,
+//     mut bevy_event_writer_you_joined: EventWriter<YouJoinedWsReceived>,
+// ) {
+//     match generic_msg.action_type {
+//         S2CActionTypes::YouJoined => {
+//             info!("Received 'YouJoined' message from ws server!");
+//             bevy_event_writer_you_joined.send(YouJoinedWsReceived {
+//                 data: generic_msg.data,
+//             });
+//         }
+//         _ => (),
+//     }
+// }
 
 // #[derive(Resource)]
 // pub struct WebSocketMessageReceiver(UnboundedReceiver<WsMessage>);

@@ -34,6 +34,8 @@ futures-channel = { version = "0.3" }
 [target.'cfg(target_arch="wasm32")'.dependencies]
 web-sys = { version = "0.3.72", features = ["WebSocket", "EventTarget", "MessageEvent", "BinaryType"] }
 send_wrapper = "0.6.0"
+wasm-bindgen = "0.2.95"
+serde-wasm-bindgen = "0.6.5"
 
 [dev-dependencies]
 assert-impl = "0.1"
