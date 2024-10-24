@@ -30,7 +30,7 @@ pub trait Widgets {
 impl<T: Spawn> Widgets for T {
     fn button(&mut self, text: impl Into<String>) -> EntityCommands {
         let mut entity = self.spawn((
-            Name::new("Button"),
+            Name::new("Play Button"),
             ButtonBundle {
                 style: Style {
                     width: Px(200.0),

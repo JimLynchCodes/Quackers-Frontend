@@ -21,6 +21,7 @@ use crate::{
 use super::websocket_connect::{
     MoveCrackersBevyEvent, OtherPlayerJoinedWsReceived, YouJoinedWsReceived,
 };
+use super::websocket_quack_msg::QuackRequestEvent;
 
 #[derive(Resource)]
 pub struct QuackAudio {
@@ -56,6 +57,7 @@ fn quack_btn_handler(
     interaction_query: Query<(Entity, &Interaction, &QuackBtnButton), Changed<Interaction>>,
     audio: Res<QuackAudio>,
     audio_assets: Res<Assets<AudioSource>>,
+    mut quack_request_bevy_event_writer: EventWriter<QuackRequestEvent>
 ) {
     for (_entity, interaction, _quack_btn) in &interaction_query {
         if matches!(interaction, Interaction::Pressed) {
@@ -68,6 +70,8 @@ fn quack_btn_handler(
                     ..Default::default()                // Use default values for other fields
                 });
                 println!("Playing YouGotCrackers sound.");
+
+                quack_request_bevy_event_writer.send(QuackRequestEvent);
             } else {
                 println!("Audio not loaded yet.");
             }
@@ -163,6 +167,7 @@ fn spacebar_quack_system(
     audio: Res<QuackAudio>,
     keyboard_input: Res<ButtonInput<KeyCode>>, // Input resource for key events
     audio_assets: Res<Assets<AudioSource>>,    // Query to find entities to affect
+    mut quack_request_bevy_event_writer: EventWriter<QuackRequestEvent>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Space) {
         println!("Space pressed!");
@@ -174,6 +179,8 @@ fn spacebar_quack_system(
                 ..Default::default()
             });
             println!("Playing your quack sound.");
+
+            quack_request_bevy_event_writer.send(QuackRequestEvent);
         } else {
             println!("Audio not loaded yet.");
         }

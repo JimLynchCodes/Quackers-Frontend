@@ -1,8 +1,6 @@
 use std::io::ErrorKind;
 
-use bevy::
-    prelude::*
-;
+use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use super::websocket_connect::WebSocketClient;
@@ -16,13 +14,66 @@ struct TransformData {
 }
 
 pub(super) fn plugin(app: &mut App) {
-
     app.add_event::<JoinRequestEvent>();
 
     // app.add_systems(Update, join_request_bevy_event_listener);
+    app.add_systems(Update, play_btn_ws_kickoff);
 }
 
 // use super::websocket_connect::WebSocketClient;
+
+fn play_btn_ws_kickoff(
+    mut commands: Commands,
+    interaction_query: Query<(Entity, &Interaction, &Name), Changed<Interaction>>,
+    mut q: Query<(&mut WebSocketClient,)>,
+    // audio: Res<QuackAudio>,
+    // audio_assets: Res<Assets<AudioSource>>,
+) {
+    for (_entity, interaction, name) in &interaction_query {
+        if matches!(interaction, Interaction::Pressed) {
+            if name.to_string() == "Play Button".to_string() {
+                println!("Making Play btn api call!");
+
+                for (mut client,) in q.iter_mut() {
+                    let json_message = build_join_request_msg("foo".to_string());
+
+                    #[cfg(not(target_arch = "wasm32"))]
+                    {
+                        client
+                            .0
+                             .0
+                            .send(tungstenite::Message::Text(json_message))
+                            .expect("sending play btn kickoff natively failed");
+                    }
+                    #[cfg(target_arch = "wasm32")]
+                    {
+                        match client.0.socket.send_with_str(&json_message) {
+                            Ok(_) => web_sys::console::log_1(&"Message sent successfully".into()),
+                            Err(err) => web_sys::console::log_1(
+                                &format!("Error sending message: {:?}", err).into(),
+                            ),
+                        }
+                    }
+                }
+            }
+        }
+
+        // if matches!(interaction, Interaction::Pressed) {
+        //     println!("clicked quack btn!");
+
+        // if let Some(_) = audio_assets.get(&audio.sound_handle) {
+        // Spawn an audio source to play the sound
+        // commands.spawn(AudioSourceBundle {
+        //     source: audio.sound_handle.clone(), // Clone the handle to use it
+        //     ..Default::default()                // Use default values for other fields
+        // });
+        // println!("Playing YouGotCrackers sound.");
+        // } else {
+        //     println!("Audio not loaded yet.");
+        // }
+        // }
+    }
+}
 
 #[derive(Event)]
 pub struct JoinRequestEvent(pub String);
