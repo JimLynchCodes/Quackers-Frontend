@@ -571,7 +571,7 @@ fn other_player_quacked_handler(
             0.0, // Assuming 2D game, z-coordinate is 0
         );
 
-        // let audio_handle = asset_server.load("audio/sound_effects/duck-quack.wav");
+        // let audio_handle = asset_server.load("audio/sound_effects/duck-quack.mp3");
 
         // if let Some(audio_handle) = audio_assets.get(&quack_audio.sound_handle) {
         // Spawn an audio source to play the sound
@@ -593,7 +593,7 @@ fn other_player_quacked_handler(
         //     ))) // Position emitter to the right
         //     .insert(SoundEmitter);
 
-        // let audio_handle = asset_server.load("audio/sound_effects/duck-quack.wav");
+        // let audio_handle = asset_server.load("audio/sound_effects/duck-quack.mp3");
         // audio.play(audio_handle);
 
         commands.spawn((
@@ -609,7 +609,7 @@ fn other_player_quacked_handler(
             // },
             Emitter::default(),
             AudioBundle {
-                source: asset_server.load("audio/sound_effects/duck-quack.wav"),
+                source: asset_server.load("audio/sound_effects/duck-quack.mp3"),
                 settings: PlaybackSettings::DESPAWN.with_spatial(true),
             },
         ));

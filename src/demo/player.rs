@@ -156,7 +156,7 @@ fn add_quack_button(mut commands: Commands) {
 struct QuackBtnButton;
 
 fn quack_sound_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let sound_handle = asset_server.load("audio/sound_effects/duck-quack.wav");
+    let sound_handle = asset_server.load("audio/sound_effects/duck-quack.mp3");
 
     // Store the handle in a resource
     commands.insert_resource(QuackAudio { sound_handle });
