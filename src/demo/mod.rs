@@ -12,6 +12,7 @@ pub mod background;
 pub mod websocket_connect;
 pub mod websocket_join_msg;
 pub mod websocket_move_msg;
+pub mod websocket_quack_msg;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
@@ -27,5 +28,6 @@ pub(super) fn plugin(app: &mut App) {
         websocket_connect::plugin,
         websocket_join_msg::plugin,
         websocket_move_msg::plugin,
+        websocket_quack_msg::plugin,
     ));
 }

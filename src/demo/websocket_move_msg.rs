@@ -1,10 +1,12 @@
-use std::io::ErrorKind;
 use bevy::prelude::*;
+use std::io::ErrorKind;
+
+use super::websocket_connect::WebSocketClient;
 // use tungstenite::Message;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_event::<MoveRequestEvent>();
-    // app.add_systems(Update, move_request_bevy_event_listener);
+    app.add_systems(Update, move_request_bevy_event_listener);
 }
 
 // pub(crate) use super::websocket_connect::WebSocketClient;
@@ -13,27 +15,39 @@ pub(super) fn plugin(app: &mut App) {
 pub struct MoveRequestEvent(pub f32, pub f32);
 
 // Listens for bevy events for ws messages and fires them off to the server
-// fn move_request_bevy_event_listener(
-//     mut ev_join_request: EventReader<MoveRequestEvent>,
-//     mut entities_with_client: Query<(&mut WebSocketClient,)>,
-// ) {
-//     for ev in ev_join_request.read() {
-//         println!("heard move request bevy event");
-//         for mut client in entities_with_client.iter_mut() {
-//             println!("sending move request ws msg");
-//             let message = build_move_request_msg(ev.0.clone(), ev.1.clone());
+fn move_request_bevy_event_listener(
+    mut ev_join_request: EventReader<MoveRequestEvent>,
+    mut entities_with_client: Query<(&mut WebSocketClient,)>,
+) {
+    for ev in ev_join_request.read() {
+        println!("heard move request bevy event");
+        for mut client in entities_with_client.iter_mut() {
+            println!("sending move request ws msg");
+            let message = build_move_request_msg(ev.0.clone(), ev.1.clone());
 
-//             match client.0 .0 .0.send(Message::text(message)) {
-//                 Ok(_) => info!("Join request ws msg successfully sent to server!"),
-//                 Err(tungstenite::Error::Io(e)) if e.kind() == ErrorKind::WouldBlock => { /* ignore */
-//                 }
-//                 Err(e) => {
-//                     warn!("Could not send the message: {e:?}");
-//                 }
-//             }
-//         }
-//     }
-// }
+            #[cfg(not(target_arch = "wasm32"))]
+            {
+                match client.0 .0 .0.send(tungstenite::Message::text(message)) {
+                    Ok(_) => info!("Join request ws msg successfully sent to server!"),
+                    Err(tungstenite::Error::Io(e)) if e.kind() == ErrorKind::WouldBlock => { /* ignore */
+                    }
+                    Err(e) => {
+                        warn!("Could not send the message: {e:?}");
+                    }
+                }
+            }
+            #[cfg(target_arch = "wasm32")]
+            {
+                match client.0.0.socket.send_with_str(&message) {
+                    Ok(_) => web_sys::console::log_1(&"Message sent successfully".into()),
+                    Err(err) => {
+                        web_sys::console::log_1(&format!("Error sending message: {:?}", err).into())
+                    }
+                }
+            }
+        }
+    }
+}
 
 #[derive(serde::Serialize)]
 struct MoveRequestData {
