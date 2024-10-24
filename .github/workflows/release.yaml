@@ -18,6 +18,7 @@ on:
 env:
   # The base filename of the binary produced by `cargo build`.
   cargo_build_binary_name: quackers-beta
+  BACKEND_WS_ENDPOINT: ${{ secrets.BACKEND_WS_ENDPOINT }}
 
   # The path to the assets directory.
   assets_path: assets
