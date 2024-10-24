@@ -68,8 +68,8 @@ pub struct InteractionAssets {
 }
 
 impl InteractionAssets {
-    pub const PATH_BUTTON_HOVER: &'static str = "audio/sound_effects/button_hover.ogg";
-    pub const PATH_BUTTON_PRESS: &'static str = "audio/sound_effects/button_press.ogg";
+    pub const PATH_BUTTON_HOVER: &'static str = "audio/sound_effects/button_hover.wav";
+    pub const PATH_BUTTON_PRESS: &'static str = "audio/sound_effects/button_press.wav";
 }
 
 impl FromWorld for InteractionAssets {

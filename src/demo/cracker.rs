@@ -28,8 +28,8 @@ pub(super) fn plugin(_app: &mut App) {
 }
 
 fn cracker_sounds_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let you_got_cracker_sound_handle = asset_server.load("audio/sound_effects/boing.ogg");
-    let cracker_move_sound_handle = asset_server.load("audio/sound_effects/chewing-cracker-sound.ogg");
+    let you_got_cracker_sound_handle = asset_server.load("audio/sound_effects/boing.wav");
+    let cracker_move_sound_handle = asset_server.load("audio/sound_effects/chewing-cracker-sound.wav");
 
     // Store the handle in a resource
     commands.insert_resource(YouGotCrackerSoundFx { sound_handle: you_got_cracker_sound_handle });

@@ -178,10 +178,10 @@ pub struct OtherPlayerAssets {
 
 impl OtherPlayerAssets {
     pub const PATH_DUCKY: &'static str = "images/ducky.png";
-    pub const PATH_STEP_1: &'static str = "audio/sound_effects/step1.ogg";
-    pub const PATH_STEP_2: &'static str = "audio/sound_effects/step2.ogg";
-    pub const PATH_STEP_3: &'static str = "audio/sound_effects/step3.ogg";
-    pub const PATH_STEP_4: &'static str = "audio/sound_effects/step4.ogg";
+    pub const PATH_STEP_1: &'static str = "audio/sound_effects/step1.wav";
+    pub const PATH_STEP_2: &'static str = "audio/sound_effects/step2.wav";
+    pub const PATH_STEP_3: &'static str = "audio/sound_effects/step3.wav";
+    pub const PATH_STEP_4: &'static str = "audio/sound_effects/step4.wav";
 }
 
 impl FromWorld for OtherPlayerAssets {
@@ -571,7 +571,7 @@ fn other_player_quacked_handler(
             0.0, // Assuming 2D game, z-coordinate is 0
         );
 
-        // let audio_handle = asset_server.load("audio/sound_effects/duck-quack.ogg");
+        // let audio_handle = asset_server.load("audio/sound_effects/duck-quack.wav");
 
         // if let Some(audio_handle) = audio_assets.get(&quack_audio.sound_handle) {
         // Spawn an audio source to play the sound
@@ -593,7 +593,7 @@ fn other_player_quacked_handler(
         //     ))) // Position emitter to the right
         //     .insert(SoundEmitter);
 
-        // let audio_handle = asset_server.load("audio/sound_effects/duck-quack.ogg");
+        // let audio_handle = asset_server.load("audio/sound_effects/duck-quack.wav");
         // audio.play(audio_handle);
 
         commands.spawn((
@@ -609,7 +609,7 @@ fn other_player_quacked_handler(
             // },
             Emitter::default(),
             AudioBundle {
-                source: asset_server.load("audio/sound_effects/duck-quack.ogg"),
+                source: asset_server.load("audio/sound_effects/duck-quack.wav"),
                 settings: PlaybackSettings::DESPAWN.with_spatial(true),
             },
         ));

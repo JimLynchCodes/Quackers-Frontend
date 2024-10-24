@@ -156,7 +156,7 @@ fn add_quack_button(mut commands: Commands) {
 struct QuackBtnButton;
 
 fn quack_sound_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let sound_handle = asset_server.load("audio/sound_effects/duck-quack.ogg");
+    let sound_handle = asset_server.load("audio/sound_effects/duck-quack.wav");
 
     // Store the handle in a resource
     commands.insert_resource(QuackAudio { sound_handle });
@@ -410,10 +410,10 @@ pub struct PlayerAssets {
 
 impl PlayerAssets {
     pub const PATH_DUCKY: &'static str = "images/ducky.png";
-    pub const PATH_STEP_1: &'static str = "audio/sound_effects/step1.ogg";
-    pub const PATH_STEP_2: &'static str = "audio/sound_effects/step2.ogg";
-    pub const PATH_STEP_3: &'static str = "audio/sound_effects/step3.ogg";
-    pub const PATH_STEP_4: &'static str = "audio/sound_effects/step4.ogg";
+    pub const PATH_STEP_1: &'static str = "audio/sound_effects/step1.wav";
+    pub const PATH_STEP_2: &'static str = "audio/sound_effects/step2.wav";
+    pub const PATH_STEP_3: &'static str = "audio/sound_effects/step3.wav";
+    pub const PATH_STEP_4: &'static str = "audio/sound_effects/step4.wav";
 }
 
 impl FromWorld for PlayerAssets {
