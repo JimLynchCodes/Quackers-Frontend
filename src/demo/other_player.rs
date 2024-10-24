@@ -597,20 +597,20 @@ fn other_player_quacked_handler(
         // audio.play(audio_handle);
 
         commands.spawn((
-            MaterialMesh2dBundle {
-                mesh: meshes.add(Circle::new(15.0)).into(),
-                material: materials.add(Color::from(BLUE)),
-                transform: Transform::from_translation(Vec3::new(
-                    other_player_quacked_response_data.player_x_position,
-                    other_player_quacked_response_data.player_y_position,
-                    100.0,
-                )),
-                ..default()
-            },
+            // MaterialMesh2dBundle {
+            //     mesh: meshes.add(Circle::new(15.0)).into(),
+            //     material: materials.add(Color::from(BLUE)),
+            //     transform: Transform::from_translation(Vec3::new(
+            //         other_player_quacked_response_data.player_x_position,
+            //         other_player_quacked_response_data.player_y_position,
+            //         100.0,
+            //     )),
+            //     ..default()
+            // },
             Emitter::default(),
             AudioBundle {
                 source: asset_server.load("audio/sound_effects/duck-quack.ogg"),
-                settings: PlaybackSettings::ONCE.with_spatial(true),
+                settings: PlaybackSettings::DESPAWN.with_spatial(true),
             },
         ));
 
