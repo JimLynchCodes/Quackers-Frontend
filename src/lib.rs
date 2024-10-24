@@ -9,7 +9,7 @@ mod theme;
 use bevy::{
     asset::AssetMetaCheck,
     audio::{AudioPlugin, SpatialScale, Volume},
-    prelude::*,
+    prelude::*, window::WindowResolution,
 };
 
 /// Spatial audio uses the distance to attenuate the sound volume. In 2D with the default camera,
@@ -44,8 +44,10 @@ impl Plugin for AppPlugin {
                     primary_window: Window {
                         title: "Ducks Test".to_string(),
                         canvas: Some("#bevy".to_string()),
-                        fit_canvas_to_parent: true,
+                        fit_canvas_to_parent: false,
+                        resolution: WindowResolution::new(600.0, 800.0),
                         prevent_default_event_handling: true,
+                        resizable: false,
                         ..default()
                     }
                     .into(),
@@ -71,6 +73,7 @@ impl Plugin for AppPlugin {
         // Enable dev tools for dev builds.
         #[cfg(feature = "dev")]
         app.add_plugins(dev_tools::plugin);
+        
     }
 }
 
