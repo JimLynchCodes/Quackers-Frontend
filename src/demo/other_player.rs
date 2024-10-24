@@ -296,7 +296,7 @@ impl FromWorld for OtherPlayerAssets {
 /// 1 pixel is 1 unit of distance, so we use a scale so that 100 pixels is 1 unit of distance for
 /// audio.
 
-const AUDIO_SCALE: f32 = 1. / 100.0;
+// const AUDIO_SCALE: f32 = 1. / 100.0;
 
 #[derive(Component, Default)]
 pub struct Emitter {

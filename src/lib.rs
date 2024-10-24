@@ -15,7 +15,7 @@ use bevy::{
 /// Spatial audio uses the distance to attenuate the sound volume. In 2D with the default camera,
 /// 1 pixel is 1 unit of distance, so we use a scale so that 100 pixels is 1 unit of distance for
 /// audio.
-const AUDIO_SCALE: f32 = 1. / 500.0;
+const AUDIO_SCALE: f32 = 1. / 200.0;
 
 pub struct AppPlugin;
 
