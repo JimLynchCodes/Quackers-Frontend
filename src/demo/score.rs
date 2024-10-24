@@ -201,11 +201,11 @@ fn bevy_event_listener_update_leaderboard(
             your_points: 0,
             your_leaderboard_place: 0,
 
-            leaderboard_name_1st_place: "--".to_string(),
-            leaderboard_name_2nd_place: "--".to_string(),
-            leaderboard_name_3rd_place: "--".to_string(),
-            leaderboard_name_4th_place: "--".to_string(),
-            leaderboard_name_5th_place: "--".to_string(),
+            leaderboard_name_1st_place: "-- ".to_string(),
+            leaderboard_name_2nd_place: "-- ".to_string(),
+            leaderboard_name_3rd_place: "-- ".to_string(),
+            leaderboard_name_4th_place: "-- ".to_string(),
+            leaderboard_name_5th_place: "-- ".to_string(),
 
             leaderboard_score_1st_place: 0,
             leaderboard_score_2nd_place: 0,
@@ -224,50 +224,94 @@ fn bevy_event_listener_update_leaderboard(
         your_position_text.sections[0].value =
             format_leaderboard_place(update_leaderboard_msg_data.your_leaderboard_place);
 
+        let first_place_name = update_leaderboard_msg_data.leaderboard_name_1st_place;
+        let second_place_name = update_leaderboard_msg_data.leaderboard_name_2nd_place;
+        let third_place_name = update_leaderboard_msg_data.leaderboard_name_3rd_place;
+        let fourth_place_name = update_leaderboard_msg_data.leaderboard_name_4th_place;
+        let fifth_place_name = update_leaderboard_msg_data.leaderboard_name_5th_place;
+
+        let no_name = "--".to_string();
+
+        let no_first_place_name = first_place_name == "--";
+        let no_second_place_name = second_place_name == "--";
+        let no_third_place_name = third_place_name == "--";
+        let no_fourth_place_name = fourth_place_name == "--";
+        let no_fifth_place_name = fifth_place_name == "--";
+
+        // name texts
         let mut place_1_name_text = text.get_mut(place_1_name.single()).unwrap();
-        place_1_name_text.sections[0].value =
-            update_leaderboard_msg_data.leaderboard_name_1st_place;
+        place_1_name_text.sections[0].value = if no_first_place_name { no_name.clone() } else {
+            format!("{} - ", first_place_name)
+        };
 
-        let mut place_1_name_text = text.get_mut(place_2_name.single()).unwrap();
-        place_1_name_text.sections[0].value =
-            update_leaderboard_msg_data.leaderboard_name_2nd_place;
-
+        let mut place_2_name_text = text.get_mut(place_2_name.single()).unwrap();
+        place_2_name_text.sections[0].value =if no_second_place_name { no_name.clone() } else {
+            format!("{} - ", second_place_name)
+        };
         let mut place_3_name_text = text.get_mut(place_3_name.single()).unwrap();
-        place_3_name_text.sections[0].value =
-            update_leaderboard_msg_data.leaderboard_name_3rd_place;
+        place_3_name_text.sections[0].value = if no_third_place_name { no_name.clone() } else {
+            format!("{} - ", third_place_name)
+        };
 
         let mut place_4_name_text = text.get_mut(place_4_name.single()).unwrap();
-        place_4_name_text.sections[0].value =
-            update_leaderboard_msg_data.leaderboard_name_4th_place;
+        place_4_name_text.sections[0].value =if no_fourth_place_name { no_name.clone() } else {
+            format!("{} - ", fourth_place_name)
+        };
 
         let mut place_5_name_text = text.get_mut(place_5_name.single()).unwrap();
-        place_5_name_text.sections[0].value =
-            update_leaderboard_msg_data.leaderboard_name_5th_place;
-
-        let mut place_1_score_text = text.get_mut(place_1_score.single()).unwrap();
-        place_1_score_text.sections[0].value = update_leaderboard_msg_data
+        place_5_name_text.sections[0].value = if no_fifth_place_name { no_name.clone() } else {
+            format!("{} - ", fifth_place_name)
+        };
+            //score texts
+        let mut place_1_score_text = text.get_mut(place_1_score.single()).unwrap();  
+        place_1_score_text.sections[0].value = if no_first_place_name {
+            "".to_string()
+        }
+        else {
+            update_leaderboard_msg_data
             .leaderboard_score_1st_place
-            .to_string();
+            .to_string()
+        };
 
-        let mut place_1_score_text = text.get_mut(place_2_score.single()).unwrap();
-        place_1_score_text.sections[0].value = update_leaderboard_msg_data
+        let mut place_2_score_text = text.get_mut(place_2_score.single()).unwrap();
+        place_2_score_text.sections[0].value = if no_second_place_name {
+            "".to_string()
+        }
+        else {
+            update_leaderboard_msg_data
             .leaderboard_score_2nd_place
-            .to_string();
+            .to_string()
+        };
 
         let mut place_3_score_text = text.get_mut(place_3_score.single()).unwrap();
-        place_3_score_text.sections[0].value = update_leaderboard_msg_data
+        place_3_score_text.sections[0].value = if no_third_place_name {
+            "".to_string()
+        }
+        else {
+            update_leaderboard_msg_data
             .leaderboard_score_3rd_place
-            .to_string();
+            .to_string()
+        };
 
         let mut place_4_score_text = text.get_mut(place_4_score.single()).unwrap();
-        place_4_score_text.sections[0].value = update_leaderboard_msg_data
+        place_4_score_text.sections[0].value = if no_fourth_place_name {
+            "".to_string()
+        }
+        else {
+            update_leaderboard_msg_data
             .leaderboard_score_4th_place
-            .to_string();
+            .to_string()
+        };
 
         let mut place_5_score_text = text.get_mut(place_5_score.single()).unwrap();
-        place_5_score_text.sections[0].value = update_leaderboard_msg_data
+        place_5_score_text.sections[0].value = if no_fifth_place_name {
+            "".to_string()
+        }
+        else {
+            update_leaderboard_msg_data
             .leaderboard_score_5th_place
-            .to_string();
+            .to_string()
+        };
 
         // text.sections[0].value = format!("Position: {:?}", update_leaderboard_msg_data.your_leaderboard_place.clone());
         //     // Update your position
@@ -586,7 +630,7 @@ fn setup_leaderboard_table(
 
                         let leaderboard_score_text_bundle = TextBundle {
                             text: Text::from_section(
-                                score.value.to_string(),
+                                "".to_string(),
                                 TextStyle {
                                     font: asset_server.load("FiraSans-Bold.ttf"),
                                     font_size: 20.0,
