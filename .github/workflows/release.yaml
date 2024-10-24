@@ -79,6 +79,7 @@ jobs:
       - get-version
     env:
       version: ${{ needs.get-version.outputs.version }}
+      BACKEND_WS_ENDPOINT: ${{ secrets.BACKEND_WS_ENDPOINT }}
     strategy:
       matrix:
         include:

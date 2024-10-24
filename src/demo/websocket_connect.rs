@@ -406,7 +406,7 @@ mod wasm_websocket {
 pub struct WebSocketClient(
     #[cfg(target_arch = "wasm32")] pub send_wrapper::SendWrapper<wasm_websocket::Client>,
     #[cfg(not(target_arch = "wasm32"))]
-    pub (
+    pub  (
         WebSocket<MaybeTlsStream<TcpStream>>,
         Response<Option<Vec<u8>>>,
     ),
@@ -476,7 +476,26 @@ fn setup_connection(
         match ev {
             WebSocketConnectionEvents::SetupConnection => {
                 info!("Setting up connection!");
-                let url = "ws://127.0.0.1:8000/ws";
+
+                let mut url = "".to_string();
+                let default_url = "ws://127.0.0.1:8000/ws".to_string();
+
+                #[cfg(not(target_arch = "wasm32"))]
+                {
+                    url = std::env::var("BACKEND_WS_ENDPOINT".to_string()).unwrap_or(default_url);
+                    info!("endpoint is: {}", url)
+                }
+
+                #[cfg(target_arch = "wasm32")]
+                {
+                    let value = env!("BACKEND_WS_ENDPOINT");
+                    if value == "" {
+                        url = default_url;
+                    } else {
+                        url = value.to_string();
+                    }
+                }
+
                 let entity = commands.spawn_empty().id();
 
                 // Define the message to send
@@ -488,7 +507,7 @@ fn setup_connection(
                 {
                     let pool = AsyncComputeTaskPool::get();
                     let task = pool.spawn(async move {
-                        let mut client = connect(url)?;
+                        let mut client = connect(&url)?;
                         match client.0.get_mut() {
                             MaybeTlsStream::Plain(p) => p.set_nonblocking(true)?,
                             MaybeTlsStream::Rustls(stream_owned) => {
@@ -519,7 +538,7 @@ fn setup_connection(
                 {
                     web_sys::console::log_1(&"//1 wasm connecting".into());
                     // Use the ewebsock or wasm-websocket client to send the message
-                    let client = wasm_websocket::Client::new(url);
+                    let client = wasm_websocket::Client::new(&url);
                     web_sys::console::log_1(&"//1 wasm connected".into());
 
                     // let message = MyMessage::new("Hello, WebSocket!".to_string());
@@ -666,7 +685,20 @@ fn recv_info(
                             }
                         });
 
-                    fun_name(&mut commands, generic_msg, &mut bevy_event_writer_you_joined, &mut bevy_event_writer_other_player_joined, &mut bevy_event_writer_other_player_quacked, &mut bevy_event_writer_other_player_moved, &audio_assets, &audio, &mut bevy_event_writer_move_crackers, &mut bevy_event_writer_update_your_score, &mut bevy_event_writer_user_disconnected, &mut bevy_event_writer_update_leaderboard);
+                    fun_name(
+                        &mut commands,
+                        generic_msg,
+                        &mut bevy_event_writer_you_joined,
+                        &mut bevy_event_writer_other_player_joined,
+                        &mut bevy_event_writer_other_player_quacked,
+                        &mut bevy_event_writer_other_player_moved,
+                        &audio_assets,
+                        &audio,
+                        &mut bevy_event_writer_move_crackers,
+                        &mut bevy_event_writer_update_your_score,
+                        &mut bevy_event_writer_user_disconnected,
+                        &mut bevy_event_writer_update_leaderboard,
+                    );
 
                     // bevy_event_writer_you_joined.send(generic_msg);
 
@@ -702,8 +734,20 @@ fn recv_info(
                         &format!("Parsed message from string: {:?}", generic_msg).into(),
                     );
 
-                    fun_name(&mut commands, generic_msg, &mut bevy_event_writer_you_joined, &mut bevy_event_writer_other_player_joined, &mut bevy_event_writer_other_player_quacked, &mut bevy_event_writer_other_player_moved, &audio_assets, &audio, &mut bevy_event_writer_move_crackers, &mut bevy_event_writer_update_your_score, &mut bevy_event_writer_user_disconnected, &mut bevy_event_writer_update_leaderboard);
-
+                    fun_name(
+                        &mut commands,
+                        generic_msg,
+                        &mut bevy_event_writer_you_joined,
+                        &mut bevy_event_writer_other_player_joined,
+                        &mut bevy_event_writer_other_player_quacked,
+                        &mut bevy_event_writer_other_player_moved,
+                        &audio_assets,
+                        &audio,
+                        &mut bevy_event_writer_move_crackers,
+                        &mut bevy_event_writer_update_your_score,
+                        &mut bevy_event_writer_user_disconnected,
+                        &mut bevy_event_writer_update_leaderboard,
+                    );
 
                     // match generic_msg.action_type {
                     //     S2CActionTypes::YouJoined => {
@@ -819,7 +863,20 @@ fn recv_info(
     }
 }
 
-fn fun_name(commands: &mut Commands, generic_msg: GenericIncomingRequest, bevy_event_writer_you_joined: &mut EventWriter<'_, YouJoinedWsReceived>, bevy_event_writer_other_player_joined: &mut EventWriter<'_, OtherPlayerJoinedWsReceived>, bevy_event_writer_other_player_quacked: &mut EventWriter<'_, OtherPlayerQuackedWsReceived>, bevy_event_writer_other_player_moved: &mut EventWriter<'_, OtherPlayerMovedWsReceived>, audio_assets: &Res<'_, Assets<AudioSource>>, audio: &Res<'_, YouGotCrackerSoundFx>, bevy_event_writer_move_crackers: &mut EventWriter<'_, MoveCrackersBevyEvent>, bevy_event_writer_update_your_score: &mut EventWriter<'_, UpdateYourScoreBevyEvent>, bevy_event_writer_user_disconnected: &mut EventWriter<'_, UserDisconnectedBevyEvent>, bevy_event_writer_update_leaderboard: &mut EventWriter<'_, UpdateLeaderboardBevyEvent>) {
+fn fun_name(
+    commands: &mut Commands,
+    generic_msg: GenericIncomingRequest,
+    bevy_event_writer_you_joined: &mut EventWriter<'_, YouJoinedWsReceived>,
+    bevy_event_writer_other_player_joined: &mut EventWriter<'_, OtherPlayerJoinedWsReceived>,
+    bevy_event_writer_other_player_quacked: &mut EventWriter<'_, OtherPlayerQuackedWsReceived>,
+    bevy_event_writer_other_player_moved: &mut EventWriter<'_, OtherPlayerMovedWsReceived>,
+    audio_assets: &Res<'_, Assets<AudioSource>>,
+    audio: &Res<'_, YouGotCrackerSoundFx>,
+    bevy_event_writer_move_crackers: &mut EventWriter<'_, MoveCrackersBevyEvent>,
+    bevy_event_writer_update_your_score: &mut EventWriter<'_, UpdateYourScoreBevyEvent>,
+    bevy_event_writer_user_disconnected: &mut EventWriter<'_, UserDisconnectedBevyEvent>,
+    bevy_event_writer_update_leaderboard: &mut EventWriter<'_, UpdateLeaderboardBevyEvent>,
+) {
     match generic_msg.action_type {
         S2CActionTypes::YouJoined => {
             info!("Received 'YouJoined' message from ws server!");
@@ -831,27 +888,23 @@ fn fun_name(commands: &mut Commands, generic_msg: GenericIncomingRequest, bevy_e
             // bevy_event_writer_move_crackers.send(YouJoinedWsReceived{ data: generic_msg.data });
         }
         S2CActionTypes::OtherPlayerJoined => {
-            let other_player_joined_response_data = serde_json::from_value(
-                generic_msg.data.clone(),
-            )
-            .unwrap_or_else(|op| {
-                info!("Failed to parse incoming websocket message: {}", op);
-                OtherPlayerData {
-                    player_uuid: "error".to_string(),
-                    player_friendly_name: "error".to_string(),
-                    color: "error".to_string(),
-                    x_position: 0.,
-                    y_position: 0.,
-                    direction_facing: DuckDirection::Right,
-                }
-            });
+            let other_player_joined_response_data =
+                serde_json::from_value(generic_msg.data.clone()).unwrap_or_else(|op| {
+                    info!("Failed to parse incoming websocket message: {}", op);
+                    OtherPlayerData {
+                        player_uuid: "error".to_string(),
+                        player_friendly_name: "error".to_string(),
+                        color: "error".to_string(),
+                        x_position: 0.,
+                        y_position: 0.,
+                        direction_facing: DuckDirection::Right,
+                    }
+                });
 
-            bevy_event_writer_other_player_joined.send(
-                OtherPlayerJoinedWsReceived {
-                    // data: generic_msg.data,
-                    data: other_player_joined_response_data,
-                },
-            );
+            bevy_event_writer_other_player_joined.send(OtherPlayerJoinedWsReceived {
+                // data: generic_msg.data,
+                data: other_player_joined_response_data,
+            });
             info!("Received 'OtherPlayerJoined' message from ws server!");
         }
         S2CActionTypes::YouQuacked => {
@@ -859,11 +912,9 @@ fn fun_name(commands: &mut Commands, generic_msg: GenericIncomingRequest, bevy_e
             info!("Received 'YouQuacked' message from ws server!");
         }
         S2CActionTypes::OtherPlayerQuacked => {
-            bevy_event_writer_other_player_quacked.send(
-                OtherPlayerQuackedWsReceived {
-                    data: generic_msg.data,
-                },
-            );
+            bevy_event_writer_other_player_quacked.send(OtherPlayerQuackedWsReceived {
+                data: generic_msg.data,
+            });
             info!("Received 'OtherPlayerQuacked' message from ws server!");
         }
         S2CActionTypes::YouMoved => {
@@ -878,23 +929,21 @@ fn fun_name(commands: &mut Commands, generic_msg: GenericIncomingRequest, bevy_e
         }
         S2CActionTypes::YouGotCrackers => {
             // Handle "YouGotCrackersMsg" from server.
-            let you_got_crackers_msg_data = serde_json::from_value(
-                generic_msg.data.clone(),
-            )
-            .unwrap_or_else(|op| {
-                info!("Failed to parse incoming websocket message: {}", op);
-                GotCrackerResponseData {
-                    player_uuid: "error".to_string(),
-                    player_friendly_name: "error".to_string(),
-                    old_cracker_x_position: 0.,
-                    old_cracker_y_position: 0.,
-                    new_cracker_x_position: 0.,
-                    new_cracker_y_position: 0.,
-                    old_cracker_point_value: 0,
-                    new_cracker_point_value: 0,
-                    new_player_score: 0,
-                }
-            });
+            let you_got_crackers_msg_data = serde_json::from_value(generic_msg.data.clone())
+                .unwrap_or_else(|op| {
+                    info!("Failed to parse incoming websocket message: {}", op);
+                    GotCrackerResponseData {
+                        player_uuid: "error".to_string(),
+                        player_friendly_name: "error".to_string(),
+                        old_cracker_x_position: 0.,
+                        old_cracker_y_position: 0.,
+                        new_cracker_x_position: 0.,
+                        new_cracker_y_position: 0.,
+                        old_cracker_point_value: 0,
+                        new_cracker_point_value: 0,
+                        new_player_score: 0,
+                    }
+                });
 
             info!(
                 "Received 'YouGotCrackers' message from ws server, new score: {}",
@@ -928,30 +977,26 @@ fn fun_name(commands: &mut Commands, generic_msg: GenericIncomingRequest, bevy_e
         }
         S2CActionTypes::OtherPlayerGotCrackers => {
             // Handle "OtherPlayerGotCrackers" from server.
-            let other_player_got_crackers_msg_data = serde_json::from_value(
-                generic_msg.data.clone(),
-            )
-            .unwrap_or_else(|op| {
-                info!("Failed to parse incoming websocket message: {}", op);
-                GotCrackerResponseData {
-                    player_uuid: "error".to_string(),
-                    player_friendly_name: "error".to_string(),
-                    old_cracker_x_position: 0.,
-                    old_cracker_y_position: 0.,
-                    new_cracker_x_position: 0.,
-                    new_cracker_y_position: 0.,
-                    old_cracker_point_value: 0,
-                    new_cracker_point_value: 0,
-                    new_player_score: 0,
-                }
-            });
+            let other_player_got_crackers_msg_data =
+                serde_json::from_value(generic_msg.data.clone()).unwrap_or_else(|op| {
+                    info!("Failed to parse incoming websocket message: {}", op);
+                    GotCrackerResponseData {
+                        player_uuid: "error".to_string(),
+                        player_friendly_name: "error".to_string(),
+                        old_cracker_x_position: 0.,
+                        old_cracker_y_position: 0.,
+                        new_cracker_x_position: 0.,
+                        new_cracker_y_position: 0.,
+                        old_cracker_point_value: 0,
+                        new_cracker_point_value: 0,
+                        new_player_score: 0,
+                    }
+                });
 
             // --> send event for crackers to move
             bevy_event_writer_move_crackers.send(MoveCrackersBevyEvent {
-                x_position: other_player_got_crackers_msg_data
-                    .new_cracker_x_position,
-                y_position: other_player_got_crackers_msg_data
-                    .new_cracker_y_position,
+                x_position: other_player_got_crackers_msg_data.new_cracker_x_position,
+                y_position: other_player_got_crackers_msg_data.new_cracker_y_position,
                 points: other_player_got_crackers_msg_data.new_cracker_point_value,
                 you_got_crackers: false,
             });

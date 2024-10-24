@@ -1,3 +1,27 @@
+
+
+## Deploying
+
+make sure to set these secrets in Github actions:
+
+1) `BUTLER_CREDENTIALS` - just straight up copy and paste the itch.io key for app you want to deploy
+
+2) `BACKEND_WS_ENDPOINT` - endpoint for the backend server. eg: `wss://your-subdomain.your-domain.com/ws`
+
+Backend ws endpoint defaults to `ws://0.0.0.0:8000/ws`
+
+but you can override it and for example get the live backend locally:
+```
+export BACKEND_WS_ENDPOINT=ws://0.0.0.0:8000/ws
+```
+
+you can also unset local env vars like this:
+```
+unset BACKEND_WS_ENDPOINT
+```
+
+Github secrets are copied over to env vars in the app by `release.yaml`.
+
 # Bevy New 2D
 
 This template is a great way to get started on a new 2D [Bevy](https://bevyengine.org/) game!
