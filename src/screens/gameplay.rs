@@ -48,17 +48,17 @@ impl FromWorld for GameplayMusic {
 }
 
 fn play_gameplay_music(mut commands: Commands, mut music: ResMut<GameplayMusic>) {
-    music.entity = Some(
-        commands
-            .spawn((
-                AudioBundle {
-                    source: music.handle.clone(),
-                    settings: PlaybackSettings::LOOP,
-                },
-                Music,
-            ))
-            .id(),
-    );
+    // music.entity = Some(
+        // commands
+        //     .spawn((
+        //         AudioBundle {
+        //             source: music.handle.clone(),
+        //             settings: PlaybackSettings::LOOP,
+        //         },
+        //         Music,
+        //     ))
+        //     .id(),
+    // );
 }
 
 fn stop_music(mut commands: Commands, mut music: ResMut<GameplayMusic>) {
