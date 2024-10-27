@@ -1,6 +1,7 @@
 use bevy::color::palettes::css::{LIME, RED};
 use bevy::prelude::*;
 use bevy::render::texture::{ImageLoaderSettings, ImageSampler};
+use bevy_kira_audio::Audio;
 use virtual_joystick::{
     create_joystick, JoystickFloating, JoystickInvisible, NoAction, VirtualJoystickEvent,
     VirtualJoystickPlugin,
@@ -10,6 +11,7 @@ use virtual_joystick::{
 
 use crate::theme::palette::{BUTTON_TEXT, NODE_BACKGROUND};
 use crate::theme::widgets::Containers;
+use bevy_kira_audio::AudioControl;
 
 use crate::demo::other_player::{unpack_duck_color, NewJoinerDataWithAllPlayers};
 use crate::{
@@ -165,25 +167,31 @@ fn quack_sound_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 fn spacebar_quack_system(
     mut commands: Commands,
     audio: Res<QuackAudio>,
+    kira_audio: Res<Audio>,
+    asset_server: Res<AssetServer>,
     keyboard_input: Res<ButtonInput<KeyCode>>, // Input resource for key events
-    audio_assets: Res<Assets<AudioSource>>,    // Query to find entities to affect
+    // audio_assets: Res<Assets<AudioSource>>,    // Query to find entities to affect
     mut quack_request_bevy_event_writer: EventWriter<QuackRequestEvent>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Space) {
         println!("Space pressed!");
 
-        if let Some(_) = audio_assets.get(&audio.sound_handle) {
+        // if let Some(_) = audio_assets.get(&audio.sound_handle) {
             // Spawn an audio source to play the sound
-            commands.spawn(AudioSourceBundle {
-                source: audio.sound_handle.clone(),
-                ..Default::default()
-            });
+            // commands.spawn(AudioSourceBundle {
+            //     source: audio.sound_handle.clone(),
+            //     ..Default::default()
+            // });
+            
+            let audio_handle: Handle<bevy_kira_audio::AudioSource> = asset_server.load("audio/sound_effects/duck-quack.mp3");
+            kira_audio.play(audio_handle);
+
             println!("Playing your quack sound.");
 
             quack_request_bevy_event_writer.send(QuackRequestEvent);
-        } else {
-            println!("Audio not loaded yet.");
-        }
+        // } else {
+        //     println!("Audio not loaded yet.");
+        // }
     }
 }
 

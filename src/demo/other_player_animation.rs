@@ -103,6 +103,9 @@ fn trigger_step_sound_effect(
                     settings: PlaybackSettings::DESPAWN.with_spatial(true),
                 },
             ));
+
+
+            
         }
     }
 }

@@ -593,26 +593,26 @@ fn other_player_quacked_handler(
         //     ))) // Position emitter to the right
         //     .insert(SoundEmitter);
 
-        // let audio_handle = asset_server.load("audio/sound_effects/duck-quack.mp3");
-        // audio.play(audio_handle);
+        let audio_handle = asset_server.load("audio/sound_effects/duck-quack.mp3");
+        audio.play(audio_handle);
 
-        commands.spawn((
-            MaterialMesh2dBundle {
-                mesh: meshes.add(Circle::new(15.0)).into(),
-                material: materials.add(Color::from(BLUE)),
-                transform: Transform::from_translation(Vec3::new(
-                    other_player_quacked_response_data.player_x_position,
-                    other_player_quacked_response_data.player_y_position,
-                    100.0,
-                )),
-                ..default()
-            },
-            Emitter::default(),
-            AudioBundle {
-                source: asset_server.load("audio/sound_effects/duck-quack.mp3"),
-                settings: PlaybackSettings::DESPAWN.with_spatial(true),
-            },
-        ));
+        // commands.spawn((
+        //     MaterialMesh2dBundle {
+        //         mesh: meshes.add(Circle::new(15.0)).into(),
+        //         material: materials.add(Color::from(BLUE)),
+        //         transform: Transform::from_translation(Vec3::new(
+        //             other_player_quacked_response_data.player_x_position,
+        //             other_player_quacked_response_data.player_y_position,
+        //             100.0,
+        //         )),
+        //         ..default()
+        //     },
+        //     Emitter::default(),
+        //     AudioBundle {
+        //         source: asset_server.load("audio/sound_effects/duck-quack.mp3"),
+        //         settings: PlaybackSettings::DESPAWN.with_spatial(true),
+        //     },
+        // ));
 
         // commands.spawn(SpatialAudioBundle {
         //     audio_source: audio_handle.clone(),
