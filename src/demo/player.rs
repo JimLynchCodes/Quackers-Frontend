@@ -54,28 +54,19 @@ fn spacial_listener_setup(
 }
 
 fn quack_btn_handler(
-    mut commands: Commands,
+    commands: Commands,
     interaction_query: Query<(Entity, &Interaction, &QuackBtnButton), Changed<Interaction>>,
-    audio: Res<QuackAudio>,
+    quack_audio: Res<QuackAudio>,
     audio_assets: Res<Assets<AudioSource>>,
-    mut quack_request_bevy_event_writer: EventWriter<QuackRequestEvent>
+    mut quack_request_bevy_event_writer: EventWriter<QuackRequestEvent>,
 ) {
     for (_entity, interaction, _quack_btn) in &interaction_query {
         if matches!(interaction, Interaction::Pressed) {
             println!("clicked quack btn!");
 
-            if let Some(_) = audio_assets.get(&audio.sound_handle) {
-                // Spawn an audio source to play the sound
-                commands.spawn(AudioSourceBundle {
-                    source: audio.sound_handle.clone(), // Clone the handle to use it
-                    ..Default::default()                // Use default values for other fields
-                });
-                println!("Playing YouGotCrackers sound.");
-
-                quack_request_bevy_event_writer.send(QuackRequestEvent);
-            } else {
-                println!("Audio not loaded yet.");
-            }
+            play_sound_nonspatial(commands, audio_assets, quack_audio);
+            quack_request_bevy_event_writer.send(QuackRequestEvent);
+            return;
         }
     }
 }
@@ -90,9 +81,8 @@ fn add_quack_button(mut commands: Commands) {
     //         // children.quack_button("Q").observe(enter_gameplay_screen);
     //     });
 
-
-        commands.spawn(
-            
+    commands
+        .spawn(
             // ShapeBundle {
             //     shape: Shape::RoundedRectangle {
             //         width: 200.0,
@@ -116,26 +106,23 @@ fn add_quack_button(mut commands: Commands) {
             //     },
             //     ..Default::default()
             // }
-            
-            
             ButtonBundle {
-            // name: Name::new("QuackButton"),
-            style: Style {
-                width: Val::Px(65.0),
-                height: Val::Px(65.0),
-                justify_content: JustifyContent::Center,
-                align_items: AlignItems::Center,
-                position_type: PositionType::Absolute, // locks button to the "HUD"
-                right: Val::Percent(5.0),
-                bottom: Val::Percent(5.0),
+                // name: Name::new("QuackButton"),
+                style: Style {
+                    width: Val::Px(65.0),
+                    height: Val::Px(65.0),
+                    justify_content: JustifyContent::Center,
+                    align_items: AlignItems::Center,
+                    position_type: PositionType::Absolute, // locks button to the "HUD"
+                    right: Val::Percent(5.0),
+                    bottom: Val::Percent(5.0),
+                    ..Default::default()
+                },
+                // background_color: Color::srgb(0.15, 0.15, 0.15).into(),
+                background_color: NODE_BACKGROUND.into(),
                 ..Default::default()
             },
-            // background_color: Color::srgb(0.15, 0.15, 0.15).into(),
-            background_color: NODE_BACKGROUND.into(),
-            ..Default::default()
-        }
-    
-    )
+        )
         .insert(QuackBtnButton)
         .with_children(|children| {
             children.spawn((
@@ -165,33 +152,48 @@ fn quack_sound_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 fn spacebar_quack_system(
     mut commands: Commands,
-    audio: Res<QuackAudio>,
+    quack_audio: Res<QuackAudio>,
     kira_audio: Res<Audio>,
     asset_server: Res<AssetServer>,
     keyboard_input: Res<ButtonInput<KeyCode>>, // Input resource for key events
-    // audio_assets: Res<Assets<AudioSource>>,    // Query to find entities to affect
+    audio_assets: Res<Assets<AudioSource>>,    // Query to find entities to affect
     mut quack_request_bevy_event_writer: EventWriter<QuackRequestEvent>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Space) {
         println!("Space pressed!");
 
-        // if let Some(_) = audio_assets.get(&audio.sound_handle) {
+        if let Some(quack_audio_source) = audio_assets.get(&quack_audio.sound_handle) {
             // Spawn an audio source to play the sound
-            commands.spawn(AudioSourceBundle {
-                source: audio.sound_handle.clone(),
-                settings: PlaybackSettings::DESPAWN.with_spatial(true),
-                ..Default::default()
-            });
-            
+            play_sound_nonspatial(commands, audio_assets, quack_audio);
+
             // let audio_handle: Handle<bevy_kira_audio::AudioSource> = asset_server.load("audio/sound_effects/duck-quack.mp3");
             // kira_audio.play(audio_handle);
 
             println!("Playing your quack sound.");
 
             quack_request_bevy_event_writer.send(QuackRequestEvent);
-        // } else {
-        //     println!("Audio not loaded yet.");
-        // }
+        } else {
+            println!("Audio not loaded yet.");
+        }
+    }
+}
+
+/// Plays NON-spatial sounds from your duck
+fn play_sound_nonspatial(
+    mut commands: Commands,
+    audio_assets: Res<Assets<AudioSource>>,
+    quack_audio: Res<QuackAudio>,
+) {
+    if let Some(_) = audio_assets.get(&quack_audio.sound_handle) {
+        println!("Playing your quack sound.");
+
+        commands.spawn(AudioSourceBundle {
+            source: quack_audio.sound_handle.clone(),
+            settings: PlaybackSettings::DESPAWN,
+            ..Default::default()
+        });
+    } else {
+        println!("Audio not loaded yet.");
     }
 }
 
