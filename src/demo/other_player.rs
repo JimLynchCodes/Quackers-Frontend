@@ -542,7 +542,7 @@ fn other_player_quacked_handler(
     mut commands: Commands,
     mut event_reader: EventReader<OtherPlayerQuackedWsReceived>,
     asset_server: Res<AssetServer>,
-    audio: Res<Audio>,
+    kira_audio: Res<Audio>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
@@ -584,7 +584,7 @@ fn other_player_quacked_handler(
         //     ..Default::default()                // Use default values for other fields
         // });
 
-        //  Non spatial
+        // v1 - Non spatial
         // commands
         //     .spawn(TransformBundle::from_transform(Transform::from_xyz(
         //         other_player_quacked_response_data.player_x_position,
@@ -593,36 +593,30 @@ fn other_player_quacked_handler(
         //     ))) // Position emitter to the right
         //     .insert(SoundEmitter);
 
-        let audio_handle = asset_server.load("audio/sound_effects/duck-quack.mp3");
-        audio.play(audio_handle);
+        // v2 - kira
+        // let audio_handle: Handle<bevy_kira_audio::AudioSource> = asset_server.load("audio/sound_effects/duck-quack.mp3");
+        // kira_audio.play(audio_handle);
 
-        // commands.spawn((
-        //     MaterialMesh2dBundle {
-        //         mesh: meshes.add(Circle::new(15.0)).into(),
-        //         material: materials.add(Color::from(BLUE)),
-        //         transform: Transform::from_translation(Vec3::new(
-        //             other_player_quacked_response_data.player_x_position,
-        //             other_player_quacked_response_data.player_y_position,
-        //             100.0,
-        //         )),
-        //         ..default()
-        //     },
-        //     Emitter::default(),
-        //     AudioBundle {
-        //         source: asset_server.load("audio/sound_effects/duck-quack.mp3"),
-        //         settings: PlaybackSettings::DESPAWN.with_spatial(true),
-        //     },
-        // ));
+        // v3 - spatial w/ despawn
+        commands.spawn((
+            MaterialMesh2dBundle {
+                mesh: meshes.add(Circle::new(15.0)).into(),
+                material: materials.add(Color::from(BLUE)),
+                transform: Transform::from_translation(Vec3::new(
+                    other_player_quacked_response_data.player_x_position,
+                    other_player_quacked_response_data.player_y_position,
+                    100.0,
+                )),
+                ..default()
+            },
+            Emitter::default(),
+            AudioBundle {
+                source: asset_server.load("audio/sound_effects/duck-quack.mp3"),
+                settings: PlaybackSettings::DESPAWN.with_spatial(true),
+            },
+        ));
 
-        // commands.spawn(SpatialAudioBundle {
-        //     audio_source: audio_handle.clone(),
-        //     transform: Transform::from_translation(Vec3::new(
-        //         other_player_quacked_response_data.player_x_position,
-        //         other_player_quacked_response_data.player_y_position,
-        //         0.0,
-        //     )),
-        //     global_transform: GlobalTransform::default(),
-        // });
+       
         // // Play the audio at the position defined above
         // audio.play(audio_handle.clone());
 

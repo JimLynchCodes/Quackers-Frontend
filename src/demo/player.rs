@@ -10,7 +10,6 @@ use virtual_joystick::{
 // use bevy::prelude::*;
 
 use crate::theme::palette::{BUTTON_TEXT, NODE_BACKGROUND};
-use crate::theme::widgets::Containers;
 use bevy_kira_audio::AudioControl;
 
 use crate::demo::other_player::{unpack_duck_color, NewJoinerDataWithAllPlayers};
@@ -178,13 +177,14 @@ fn spacebar_quack_system(
 
         // if let Some(_) = audio_assets.get(&audio.sound_handle) {
             // Spawn an audio source to play the sound
-            // commands.spawn(AudioSourceBundle {
-            //     source: audio.sound_handle.clone(),
-            //     ..Default::default()
-            // });
+            commands.spawn(AudioSourceBundle {
+                source: audio.sound_handle.clone(),
+                settings: PlaybackSettings::DESPAWN.with_spatial(true),
+                ..Default::default()
+            });
             
-            let audio_handle: Handle<bevy_kira_audio::AudioSource> = asset_server.load("audio/sound_effects/duck-quack.mp3");
-            kira_audio.play(audio_handle);
+            // let audio_handle: Handle<bevy_kira_audio::AudioSource> = asset_server.load("audio/sound_effects/duck-quack.mp3");
+            // kira_audio.play(audio_handle);
 
             println!("Playing your quack sound.");
 

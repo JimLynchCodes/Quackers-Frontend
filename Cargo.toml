@@ -5,7 +5,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bevy = { version = "0.14", features = ["serialize"] }
+bevy = { version = "0.14", features = ["serialize", "jpeg"] }
 bevy_audio = { version = "0.14", features = ["wav", "mp3"] }
 
 rand = "0.8"

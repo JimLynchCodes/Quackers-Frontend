@@ -4,7 +4,11 @@
 //! - [Sprite animation](https://github.com/bevyengine/bevy/blob/latest/examples/2d/sprite_animation.rs)
 //! - [Timers](https://github.com/bevyengine/bevy/blob/latest/examples/time/timers.rs)
 
-use bevy::{color::palettes::css::BLUE, prelude::*, render::texture::{ImageLoaderSettings, ImageSampler}, sprite::MaterialMesh2dBundle
+use bevy::{
+    color::palettes::css::BLUE,
+    prelude::*,
+    render::texture::{ImageLoaderSettings, ImageSampler},
+    sprite::MaterialMesh2dBundle,
 };
 use rand::prelude::*;
 use std::time::Duration;
@@ -103,9 +107,6 @@ fn trigger_step_sound_effect(
                     settings: PlaybackSettings::DESPAWN.with_spatial(true),
                 },
             ));
-
-
-            
         }
     }
 }

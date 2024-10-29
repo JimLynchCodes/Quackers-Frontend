@@ -45,7 +45,7 @@ impl Plugin for AppPlugin {
                         title: "Ducks Test".to_string(),
                         canvas: Some("#bevy".to_string()),
                         fit_canvas_to_parent: true,
-                        resolution: WindowResolution::new(400.0, 800.0),
+                        resolution: WindowResolution::new(600.0, 800.0),
                         prevent_default_event_handling: true,
                         resizable: false,
                         ..default()
