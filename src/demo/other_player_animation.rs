@@ -90,9 +90,28 @@ fn trigger_step_sound_effect(
             // ));
 
             // Sound
-            commands.spawn((
+            // commands.spawn(
+            //     (
+            //     MaterialMesh2dBundle {
+            //         mesh: meshes.add(Circle::new(15.0)).into(),
+            //         material: materials.add(Color::from(BLUE)),
+            //         transform: Transform::from_translation(Vec3::new(
+            //             transform.translation.x,
+            //             transform.translation.y,
+            //             100.0,
+            //         )),
+            //         ..default()
+            //     },
+            //     Emitter::default(),
+            //     AudioBundle {
+            //         source: random_step.clone(),
+            //         settings: PlaybackSettings::DESPAWN.with_spatial(true),
+            //     },
+            // ));
+            commands.spawn(
+                (
                 MaterialMesh2dBundle {
-                    mesh: meshes.add(Circle::new(15.0)).into(),
+                    mesh: meshes.add(Circle::new(0.0)).into(),
                     material: materials.add(Color::from(BLUE)),
                     transform: Transform::from_translation(Vec3::new(
                         transform.translation.x,
