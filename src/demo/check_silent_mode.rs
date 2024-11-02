@@ -19,7 +19,7 @@ pub mod wasm_silent_mode {
     "#)]
     extern "C" {
         #[wasm_bindgen(js_name = "isSilentMode")]
-        async fn is_silent_mode_js() -> JsValue;
+        pub async fn is_silent_mode_js() -> JsValue;
     }
 
 }
