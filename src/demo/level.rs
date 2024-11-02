@@ -18,6 +18,9 @@ pub(super) fn plugin(_app: &mut App) {
     _app.add_systems(Update, adjust_camera_ratio);
 
     _app.add_systems(Startup, check_for_silent_mode_once);
+
+    _app.insert_resource(SilentModeStatus { is_silent: Arc::new(Mutex::new(None)) });
+
     // _app.add_systems(Update, display_popup_if_silent);
     // _app.add_systems(Update, display_popup_if_silent.system());
 }
