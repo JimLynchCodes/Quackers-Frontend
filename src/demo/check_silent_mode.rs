@@ -35,7 +35,7 @@ pub async fn check_silent_mode(shared_status: Arc<Mutex<Option<bool>>>) {
     
     #[cfg(target_arch = "wasm32")] {
 
-        use wasm_silent_mode;
+        use wasm_silent_mode::is_silent_mode_js;
 
         let result = is_silent_mode_js().await;
         let is_silent = result.as_bool().unwrap_or(false);
