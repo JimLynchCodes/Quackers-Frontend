@@ -14,6 +14,9 @@ pub mod websocket_join_msg;
 pub mod websocket_move_msg;
 pub mod websocket_quack_msg;
 
+// Helper functions that are NOT plugins
+pub mod check_silent_mode;
+
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
         movement::plugin,
