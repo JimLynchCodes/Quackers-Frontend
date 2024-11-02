@@ -41,9 +41,9 @@ pub async fn check_silent_mode(shared_status: Arc<Mutex<Option<bool>>>) {
         let is_silent = result.as_bool().unwrap_or(false);
 
         if is_silent {
-            web_sys::console::log_1(&"Silencer is ON! {:?}".into(), is_silent);
+            web_sys::console::log_1(&"Silencer is ON!".into());
         } else {
-            web_sys::console::log_1(&"Silencer is OFF! {:?}".into(), is_silent);
+            web_sys::console::log_1(&"Silencer is OFF!".into());
         }
         *status = Some(is_silent);
     }
