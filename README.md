@@ -20,6 +20,8 @@ you can also unset local env vars like this:
 unset BACKEND_WS_ENDPOINT
 ```
 
+You can also view and locally run the [Quackers-Backend code](https://github.com/JimLynchCodes/Quackers-Backend). 
+
 Github secrets are copied over to env vars in the app by `release.yaml`.
 
 # Bevy New 2D
