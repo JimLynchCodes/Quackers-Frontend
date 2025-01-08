@@ -1,4 +1,32 @@
 
+# Quackers Frontend
+
+Bevy code for the amazing online multiplayer game: _[Quackers](https://quackers-game.itch.io/quackers-beta)_
+
+<br/>
+
+## Quickstart
+
+1) Install wasm built target:
+```
+rustup target add wasm32-unknown-unknown
+```
+
+2) Set backend endpoint
+
+```
+export BACKEND_WS_ENDPOINT=ws://0.0.0.0:8000/ws
+```
+
+_Note: You'll also need to have the [Quackers backend project](https://github.com/JimLynchCodes/Quackers-Backend) running locally in order for the game to work properly._ 
+
+
+3) Run frontend wasm project locally in a browser: 
+```
+trunk serve
+```
+
+<br/>
 
 ## Deploying
 

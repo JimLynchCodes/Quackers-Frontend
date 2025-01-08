@@ -488,7 +488,7 @@ fn setup_connection(
 
                 #[cfg(target_arch = "wasm32")]
                 {
-                    let value = env!("BACKEND_WS_ENDPOINT");
+                    let value = env!("BACKEND_WS_ENDPOINT"); // TODO prevent from crashing and use default?
                     if value == "" {
                         url = default_url;
                     } else {
